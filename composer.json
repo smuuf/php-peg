@@ -1,13 +1,13 @@
 {
-    "name": "hnesk/php-peg",
-    "description": "Minimally invasive fork of hafriedlander/php-peg with support for composer autoloading",
+    "name": "combyna/php-peg",
+    "description": "PEG parser-generator for PHP",
     "keywords": [
         "PEG",
         "parser",
         "DSL",
         "compiler"
     ],
-    "homepage": "https://github.com/hnesk/php-peg",
+    "homepage": "https://github.com/combyna/php-peg",
     "type": "library",
     "license": [
         "MIT",
@@ -23,6 +23,11 @@
         {
             "name": "Johannes Künsebeck",
             "email": "kuensebeck@googlemail.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Dan Phillimore",
+            "email": "dan@ovms.co",
             "role": "Developer"
         }
     ],

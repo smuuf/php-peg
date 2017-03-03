@@ -47,7 +47,7 @@ class Compiler {
 	static function compile( $string ) {
 		static $rx = '@
 			^([\x20\t]*)/\*!\* (?:[\x20\t]*(!?\w*))?   # Start with some indent, a comment with the special marker, then an optional name
-			((?:[^*]|\*[^/])*)                         # Any amount of "a character that isnt a star, or a star not followed by a /
+			((?:[^*]|\*[^/])*?)                        # Any amount of "a character that isnt a star, or a star not followed by a /
 			\*/                                        # The comment end
 		@mx';
 
