@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
 
-require '../autoloader.php';
+require __DIR__ . '/../autoloader.php';
 
 use hafriedlander\Peg\Compiler;
 
