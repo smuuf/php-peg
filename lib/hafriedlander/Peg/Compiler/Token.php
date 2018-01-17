@@ -17,19 +17,19 @@ namespace hafriedlander\Peg\Compiler;
  */
 abstract class Token extends PHPWriter {
 
-	public $quantifier = NULL;
+	public $quantifier = \null;
 
-	public $positive_lookahead = FALSE ;
-	public $negative_lookahead = FALSE ;
+	public $positive_lookahead = \false ;
+	public $negative_lookahead = \false ;
 
-	public $silent = FALSE ;
+	public $silent = \false ;
 
-	public $tag = FALSE ;
+	public $tag = \false ;
 
 	public $type ;
 	public $value ;
 
-	function __construct( $type, $value = NULL ) {
+	function __construct( $type, $value = \null ) {
 		$this->type = $type ;
 		$this->value = $value ;
 	}
@@ -46,10 +46,10 @@ abstract class Token extends PHPWriter {
 			if (0 === $q['min'] && 1 === $q['max']) {
 				// optional: ? || {0,1}
 				$code = $this->optional($code, $id);
-			} else if (0 === $q['min'] && null === $q['max']) {
+			} else if (0 === $q['min'] && \null === $q['max']) {
 				// zero or more: * || {0,}
 				$code = $this->zero_or_more($code, $id);
-			} else if (null === $q['max']) {
+			} else if (\null === $q['max']) {
 				// n or more: + || {n,}
 				$code = $this->n_or_more($code, $id, $q['min']);
 			} else {
@@ -93,13 +93,13 @@ abstract class Token extends PHPWriter {
 				$code->replace(array(
 					'MATCH' => PHPBuilder::build()
 						->l(
-						'$subres = $result; $result = array_pop($stack);',
+						'$subres = $result; $result = \array_pop($stack);',
 						'$this->store( $result, $subres, \''.$this->tag.'\' );',
 						'MATCH'
 					),
 					'FAIL' => PHPBuilder::build()
 						->l(
-						'$result = array_pop($stack);',
+						'$result = \array_pop($stack);',
 						'FAIL'
 					)
 				)));
@@ -112,18 +112,18 @@ abstract class Token extends PHPWriter {
 	{
 		return PHPBuilder::build()->l(
 			$this->save($id),
-			$code->replace(array('FAIL' => $this->restore($id,true)))
+			$code->replace(array('FAIL' => $this->restore($id,\true)))
 		);
 	}
 
 	protected function zero_or_more($code, $id)
 	{
 		return PHPBuilder::build()->b(
-			'while (true)',
+			'while (\true)',
 			$this->save($id),
 			$code->replace(array(
-				'MATCH' => NULL,
-				'FAIL' => $this->restore($id, true)->l('break;')
+				'MATCH' => \null,
+				'FAIL' => $this->restore($id, \true)->l('break;')
 			))
 		)->l('MATCH');
 	}
@@ -133,11 +133,11 @@ abstract class Token extends PHPWriter {
 		return PHPBuilder::build()->l(
 			'$count = 0;'
 		)->b(
-			'while (true)',
+			'while (\true)',
 			$this->save($id),
 			$code->replace(array(
-				'MATCH' => NULL,
-				'FAIL' => $this->restore($id, true)->l('break;')
+				'MATCH' => \null,
+				'FAIL' => $this->restore($id, \true)->l('break;')
 			)),
 			'$count++;'
 		)->b(
@@ -159,8 +159,8 @@ abstract class Token extends PHPWriter {
 			'while ($count < '.$max.')',
 			$this->save($id),
 			$code->replace(array(
-				'MATCH' => NULL,
-				'FAIL' => $this->restore($id, true)->l('break;')
+				'MATCH' => \null,
+				'FAIL' => $this->restore($id, \true)->l('break;')
 			)),
 			'$count++;'
 		)->b(

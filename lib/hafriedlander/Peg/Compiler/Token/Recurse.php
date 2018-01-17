@@ -41,17 +41,17 @@ class Recurse extends Token {
 			);
 		}
 		else {
-			$debug_header = $debug_match = $debug_fail = NULL ;
+			$debug_header = $debug_match = $debug_fail = \null ;
 		}
 
 		return PHPBuilder::build()->l(
 			'$matcher = \'match_\'.'.$function.'; $key = $matcher; $pos = $this->pos;',
 			$debug_header,
-			'$subres = ( $this->packhas( $key, $pos ) ? $this->packread( $key, $pos ) : $this->packwrite( $key, $pos, $this->$matcher(array_merge($stack, array($result))) ) );',
-			$this->match_fail_conditional( '$subres !== FALSE',
+			'$subres = ( $this->packhas( $key, $pos ) ? $this->packread( $key, $pos ) : $this->packwrite( $key, $pos, $this->$matcher(\array_merge($stack, array($result))) ) );',
+			$this->match_fail_conditional( '$subres !== \false',
 				PHPBuilder::build()->l(
 					$debug_match,
-					$this->tag === FALSE ?
+					$this->tag === \false ?
 						'$this->store( $result, $subres );' :
 						'$this->store( $result, $subres, "'.$storetag.'" );'
 				),

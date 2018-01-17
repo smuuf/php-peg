@@ -3,22 +3,22 @@
 namespace hafriedlander\Peg\Compiler;
 
 class RuleSet {
-	public $rules = array();
+	public $rules = [];
 
 	function addRule($indent, $lines, &$out) {
 		$rule = new Rule($this, $lines) ;
 		$this->rules[$rule->name] = $rule;
 
-		$out[] = $indent . '/* ' . $rule->name . ':' . $rule->rule . ' */' . PHP_EOL ;
+		$out[] = $indent . '/* ' . $rule->name . ':' . $rule->rule . ' */' .\PHP_EOL ;
 		$out[] = $rule->compile($indent) ;
-		$out[] = PHP_EOL ;
+		$out[] =\PHP_EOL ;
 	}
 
 	function compile($indent, $rulestr) {
 		$indentrx = '@^'.preg_quote($indent).'@';
 
-		$out = array();
-		$block = array();
+		$out = [];
+		$block = [];
 
 		foreach (preg_split('/\r\n|\r|\n/', $rulestr) as $line) {
 			// Ignore blank lines

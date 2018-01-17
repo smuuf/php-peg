@@ -15,12 +15,12 @@ class Packrat extends Basic {
 	function __construct( $string ) {
 		parent::__construct( $string ) ;
 
-		$max = unpack( 'N', "\x00\xFD\xFF\xFF" ) ;
-		if ( strlen( $string ) > $max[1] ) user_error( 'Attempting to parse string longer than Packrat Parser can handle', E_USER_ERROR ) ;
+		$max = \unpack( 'N', "\x00\xFD\xFF\xFF" ) ;
+		if ( \strlen( $string ) > $max[1] ) user_error( 'Attempting to parse string longer than Packrat Parser can handle', E_USER_ERROR ) ;
 
-		$this->packstatebase = str_repeat( "\xFF", strlen( $string )*3 ) ;
-		$this->packstate = array() ;
-		$this->packres = array() ;
+		$this->packstatebase = \str_repeat( "\xFF", \strlen( $string )*3 ) ;
+		$this->packstate = [] ;
+		$this->packres = [] ;
 	}
 
 	function packhas( $key, $pos ) {
@@ -30,9 +30,9 @@ class Packrat extends Basic {
 
 	function packread( $key, $pos ) {
 		$pos *= 3 ;
-		if ( $this->packstate[$key][$pos] == "\xFE" ) return FALSE ;
+		if ( $this->packstate[$key][$pos] == "\xFE" ) return \false ;
 
-		$this->pos = ord($this->packstate[$key][$pos]) << 16 | ord($this->packstate[$key][$pos+1]) << 8 | ord($this->packstate[$key][$pos+2]) ;
+		$this->pos = \ord($this->packstate[$key][$pos]) << 16 | \ord($this->packstate[$key][$pos+1]) << 8 | \ord($this->packstate[$key][$pos+2]) ;
 		return $this->packres["$key:$pos"] ;
 	}
 
@@ -41,8 +41,8 @@ class Packrat extends Basic {
 
 		$pos *= 3 ;
 
-		if ( $res !== FALSE ) {
-			$i = pack( 'N', $this->pos ) ;
+		if ( $res !== \false ) {
+			$i = \pack( 'N', $this->pos ) ;
 
 			$this->packstate[$key][$pos]   = $i[1] ;
 			$this->packstate[$key][$pos+1] = $i[2] ;

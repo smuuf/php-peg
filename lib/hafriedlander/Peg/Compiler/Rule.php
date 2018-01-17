@@ -52,17 +52,17 @@ class Rule extends PHPWriter {
 		$this->lines = $lines;
 
 		// Find the first line (if any) that's an attached function definition. Can skip first line (unless this block is malformed)
-		for ($i = 1; $i < count($lines); $i++) {
-			if (preg_match(self::$function_rx, $lines[$i])) break;
+		for ($i = 1; $i < \count($lines); $i++) {
+			if (\preg_match(self::$function_rx, $lines[$i])) break;
 		}
 
 		// Then split into the two parts
-		$spec = array_slice($lines, 0, $i);
-		$funcs = array_slice($lines, $i);
+		$spec = \array_slice($lines, 0, $i);
+		$funcs = \array_slice($lines, $i);
 
 		// Parse out the spec
-		$spec = implode("\n", $spec);
-		if (!preg_match(self::$rule_rx, $spec, $specmatch)) user_error('Malformed rule spec ' . $spec, E_USER_ERROR);
+		$spec = \implode("\n", $spec);
+		if (!\preg_match(self::$rule_rx, $spec, $specmatch)) user_error('Malformed rule spec ' . $spec, E_USER_ERROR);
 
 		$this->name = $specmatch['name'];
 
@@ -71,13 +71,13 @@ class Rule extends PHPWriter {
 			if (!$this->extends) user_error('Extended rule '.$specmatch['extends'].' is not defined before being extended', E_USER_ERROR);
 		}
 
-		$this->arguments = array();
+		$this->arguments = [];
 
 		if ($specmatch['arguments']) {
-			preg_match_all(self::$argument_rx, $specmatch['arguments'], $arguments, PREG_SET_ORDER);
+			\preg_match_all(self::$argument_rx, $specmatch['arguments'], $arguments, \PREG_SET_ORDER);
 
 			foreach ($arguments as $argument){
-				$this->arguments[trim($argument[1])] = trim($argument[2]);
+				$this->arguments[\trim($argument[1])] = \trim($argument[2]);
 			}
 		}
 
@@ -90,16 +90,16 @@ class Rule extends PHPWriter {
 		else {
 			if (!$this->extends) user_error('Replace matcher, but not on an extends rule', E_USER_ERROR);
 
-			$this->replacements = array();
-			preg_match_all(self::$replacement_rx, $specmatch['rule'], $replacements, PREG_SET_ORDER);
+			$this->replacements = [];
+			\preg_match_all(self::$replacement_rx, $specmatch['rule'], $replacements, \PREG_SET_ORDER);
 
 			$rule = $this->extends->rule;
 
 			foreach ($replacements as $replacement) {
-				$search = trim($replacement[1]);
-				$replace = trim($replacement[3]); if ($replace == "''" || $replace == '""') $replace = "";
+				$search = \trim($replacement[1]);
+				$replace = \trim($replacement[3]); if ($replace == "''" || $replace == '""') $replace = "";
 
-				$rule = str_replace($search, ' '.$replace.' ', $rule);
+				$rule = \str_replace($search, ' '.$replace.' ', $rule);
 			}
 
 			$this->rule = $rule;
@@ -108,27 +108,27 @@ class Rule extends PHPWriter {
 
 		// Parse out the functions
 
-		$this->functions = array() ;
+		$this->functions = [] ;
 
-		$active_function = NULL ;
+		$active_function = \null ;
 
 		foreach( $funcs as $line ) {
 			/* Handle function definitions */
-			if ( preg_match( self::$function_rx, $line, $func_match, 0 ) ) {
+			if ( \preg_match( self::$function_rx, $line, $func_match, 0 ) ) {
 				$active_function = $func_match[1];
-				$this->functions[$active_function] = $func_match[2] . PHP_EOL;
+				$this->functions[$active_function] = $func_match[2] . \PHP_EOL;
 			}
-			else $this->functions[$active_function] .= $line . PHP_EOL ;
+			else $this->functions[$active_function] .= $line . \PHP_EOL ;
 		}
 	}
 
 	/* Manual parsing, because we can't bootstrap ourselves yet */
 	function parse_rule() {
-		$rule = trim( $this->rule ) ;
+		$rule = \trim( $this->rule ) ;
 
-		$tokens = array() ;
+		$tokens = [] ;
 		$this->tokenize( $rule, $tokens ) ;
-		$this->parsed = ( count( $tokens ) == 1 ? array_pop( $tokens ) : new Token\Sequence( $tokens ) ) ;
+		$this->parsed = ( \count( $tokens ) == 1 ? \array_pop( $tokens ) : new Token\Sequence( $tokens ) ) ;
 	}
 
 	static $rx_rx = '@\G/(
@@ -144,70 +144,70 @@ class Rule extends PHPWriter {
 		while ( $o < $length ) {
 
 			/* Absorb white-space */
-			if ( preg_match( '/\G\s+/', $str, $match, 0, $o ) ) {
+			if ( \preg_match( '/\G\s+/', $str, $match, 0, $o ) ) {
 				$o += strlen( $match[0] ) ;
 			}
 			/* Handle expression labels */
-			elseif ( preg_match( '/\G(\w*):/', $str, $match, 0, $o ) ) {
+			elseif ( \preg_match( '/\G(\w*):/', $str, $match, 0, $o ) ) {
 				$pending->set( 'tag', isset( $match[1] ) ? $match[1] : '' ) ;
 				$o += strlen( $match[0] ) ;
 			}
 			/* Handle descent token */
-			elseif ( preg_match( '/\G[\w-]+/', $str, $match, 0, $o ) ) {
+			elseif ( \preg_match( '/\G[\w-]+/', $str, $match, 0, $o ) ) {
 				$tokens[] = $t = new Token\Recurse( $match[0] ) ;
 				$pending->apply_if_present( $t ) ;
 				$o += strlen( $match[0] ) ;
 			}
 			/* Handle " quoted literals */
-			elseif ( preg_match( '/\G"[^"]*"/', $str, $match, 0, $o ) ) {
+			elseif ( \preg_match( '/\G"[^"]*"/', $str, $match, 0, $o ) ) {
 				$tokens[] = $t = new Token\Literal( $match[0] ) ;
 				$pending->apply_if_present( $t ) ;
 				$o += strlen( $match[0] ) ;
 			}
 			/* Handle ' quoted literals */
-			elseif ( preg_match( "/\G'[^']*'/", $str, $match, 0, $o ) ) {
+			elseif ( \preg_match( "/\G'[^']*'/", $str, $match, 0, $o ) ) {
 				$tokens[] = $t = new Token\Literal( $match[0] ) ;
 				$pending->apply_if_present( $t ) ;
 				$o += strlen( $match[0] ) ;
 			}
 			/* Handle regexs */
-			elseif ( preg_match( self::$rx_rx, $str, $match, 0, $o ) ) {
+			elseif ( \preg_match( self::$rx_rx, $str, $match, 0, $o ) ) {
 				$tokens[] = $t = new Token\Regex( $match[0] ) ;
 				$pending->apply_if_present( $t ) ;
 				$o += strlen( $match[0] ) ;
 			}
 			/* Handle $ call literals */
-			elseif ( preg_match( '/\G\$(\w+)/', $str, $match, 0, $o ) ) {
+			elseif ( \preg_match( '/\G\$(\w+)/', $str, $match, 0, $o ) ) {
 				$tokens[] = $t = new Token\ExpressionedRecurse( $match[1] ) ;
 				$pending->apply_if_present( $t ) ;
 				$o += strlen( $match[0] ) ;
 			}
 			/* Handle flags */
-			elseif ( preg_match( '/\G\@(\w+)/', $str, $match, 0, $o ) ) {
-				$l = count( $tokens ) - 1 ;
+			elseif ( \preg_match( '/\G\@(\w+)/', $str, $match, 0, $o ) ) {
+				$l = \count( $tokens ) - 1 ;
 				$o += strlen( $match[0] ) ;
 				user_error( "TODO: Flags not currently supported", E_USER_WARNING ) ;
 			}
 			/* Handle control tokens */
 			else {
 				$c = substr( $str, $o, 1 ) ;
-				$l = count( $tokens ) - 1 ;
+				$l = \count( $tokens ) - 1 ;
 				$o += 1 ;
 				switch( $c ) {
 					case '?':
 						$tokens[$l]->quantifier = array('min' => 0, 'max' => 1);
 						break ;
 					case '*':
-						$tokens[$l]->quantifier = array('min' => 0, 'max' => null);
+						$tokens[$l]->quantifier = array('min' => 0, 'max' => \null);
 						break ;
 					case '+':
-						$tokens[$l]->quantifier = array('min' => 1, 'max' => null);
+						$tokens[$l]->quantifier = array('min' => 1, 'max' => \null);
 						break ;
 					case '{':
-						if (preg_match('/\G\{([0-9]+)(,([0-9]*))?\}/', $str, $matches, 0, $o - 1)) {
+						if (\preg_match('/\G\{([0-9]+)(,([0-9]*))?\}/', $str, $matches, 0, $o - 1)) {
 							$min = $max = (int) $matches[1];
 							if(isset($matches[2])) {
-								$max = $matches[3] ? (int) $matches[3] : null;
+								$max = $matches[3] ? (int) $matches[3] : \null;
 							}
 							$tokens[$l]->quantifier = array('min' => $min, 'max' => $max);
 							$o += strlen($matches[0]) - 1;
@@ -231,15 +231,15 @@ class Rule extends PHPWriter {
 
 					case '[':
 					case ']':
-						$tokens[] = new Token\Whitespace( FALSE ) ;
+						$tokens[] = new Token\Whitespace( \false ) ;
 						break ;
 					case '<':
 					case '>':
-						$tokens[] = new Token\Whitespace( TRUE ) ;
+						$tokens[] = new Token\Whitespace( \true ) ;
 						break ;
 
 					case '(':
-						$subtokens = array() ;
+						$subtokens = [] ;
 						$o = $this->tokenize( $str, $subtokens, $o ) ;
 						$tokens[] = $t = new Token\Sequence( $subtokens ) ; $pending->apply_if_present( $t ) ;
 						break ;
@@ -248,11 +248,11 @@ class Rule extends PHPWriter {
 
 					case '|':
 						$option1 = $tokens ;
-						$option2 = array() ;
+						$option2 = [] ;
 						$o = $this->tokenize( $str, $option2, $o ) ;
 
-						$option1 = (count($option1) == 1) ? $option1[0] : new Token\Sequence( $option1 );
-						$option2 = (count($option2) == 1) ? $option2[0] : new Token\Sequence( $option2 );
+						$option1 = (\count($option1) == 1) ? $option1[0] : new Token\Sequence( $option1 );
+						$option2 = (\count($option2) == 1) ? $option2[0] : new Token\Sequence( $option2 );
 
 						$pending->apply_if_present( $option2 ) ;
 
@@ -275,17 +275,17 @@ class Rule extends PHPWriter {
 		$function_name = $this->function_name( $this->name ) ;
 
 		// Build the typestack
-		$typestack = array(); $class=$this;
+		$typestack = []; $class=$this;
 		do {
 			$typestack[] = $this->function_name($class->name);
 		}
 		while($class = $class->extends);
 
-		$typestack = "array('" . implode("','", $typestack) . "')";
+		$typestack = "array('" . \implode("','", $typestack) . "')";
 
 		// Build an array of additional arguments to add to result node (if any)
 		if (empty($this->arguments)) {
-			$arguments = 'null';
+			$arguments = '\null';
 		}
 		else {
 			$arguments = "array(";
@@ -297,23 +297,23 @@ class Rule extends PHPWriter {
 
 		$match->l("protected \$match_{$function_name}_typestack = $typestack;");
 
-		$match->b( "function match_{$function_name} (\$stack = array())",
+		$match->b( "function match_{$function_name} (\$stack = [])",
 			'$matchrule = "'.$function_name.'"; $result = $this->construct($matchrule, $matchrule, '.$arguments.');',
 			$this->parsed->compile()->replace(array(
 				'MATCH' => 'return $this->finalise($result);',
-				'FAIL' => 'return FALSE;'
+				'FAIL' => 'return \false;'
 			))
 		);
 
-		$functions = array() ;
+		$functions = [] ;
 		foreach( $this->functions as $name => $function ) {
-			$function_name = $this->function_name( preg_match( '/^_/', $name ) ? $this->name.$name : $this->name.'_'.$name ) ;
-			$functions[] = implode( PHP_EOL, array(
+			$function_name = $this->function_name( \preg_match( '/^_/', $name ) ? $this->name.$name : $this->name.'_'.$name ) ;
+			$functions[] = \implode( \PHP_EOL, array(
 				'public function ' . $function_name . ' ' . $function
 			));
 		}
 
 		// print_r( $match ) ; return '' ;
-		return $match->render(NULL, $indent) . PHP_EOL . PHP_EOL . implode( PHP_EOL, $functions ) ;
+		return $match->render(\null, $indent) . \PHP_EOL . \PHP_EOL . \implode( \PHP_EOL, $functions ) ;
 	}
 }

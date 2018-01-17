@@ -21,7 +21,7 @@ class Option extends Token {
 			$code->l(
 				$opt->compile()->replace(array(
 					'MATCH' => 'MBREAK',
-					'FAIL' => NULL
+					'FAIL' => \null
 				)),
 				$this->restore($id)
 			);

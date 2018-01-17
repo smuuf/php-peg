@@ -10,6 +10,6 @@ class Whitespace extends Terminal {
 	/* Call recursion indirectly */
 	function match_code( $value ) {
 		$code = parent::match_code( '' ) ;
-		return $value ? $code->replace( array( 'FAIL' => NULL )) : $code ;
+		return $value ? $code->replace( array( 'FAIL' => \null )) : $code ;
 	}
 }

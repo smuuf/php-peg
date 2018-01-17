@@ -15,19 +15,19 @@ class CachedRegexp {
 		$this->parser = $parser ;
 		$this->rx = $rx . 'Sx' ;
 
-		$this->matches = NULL ;
-		$this->match_pos = NULL ; // NULL is no-match-to-end-of-string, unless check_pos also == NULL, in which case means undefined
-		$this->check_pos = NULL ;
+		$this->matches = \null ;
+		$this->match_pos = \null ; // \null is no-match-to-end-of-string, unless check_pos also == \null, in which case means undefined
+		$this->check_pos = \null ;
 	}
 
 	function match() {
 		$current_pos = $this->parser->pos ;
-		$dirty = $this->check_pos === NULL || $this->check_pos > $current_pos || ( $this->match_pos !== NULL && $this->match_pos < $current_pos ) ;
+		$dirty = $this->check_pos === \null || $this->check_pos > $current_pos || ( $this->match_pos !== \null && $this->match_pos < $current_pos ) ;
 
 		if ( $dirty ) {
 			$this->check_pos = $current_pos ;
-			$matched = preg_match( $this->rx, $this->parser->string, $this->matches, PREG_OFFSET_CAPTURE, $this->check_pos) ;
-			if ( $matched ) $this->match_pos = $this->matches[0][1] ; else $this->match_pos = NULL ;
+			$matched = \preg_match( $this->rx, $this->parser->string, $this->matches, \PREG_OFFSET_CAPTURE, $this->check_pos) ;
+			if ( $matched ) $this->match_pos = $this->matches[0][1] ; else $this->match_pos = \null ;
 		}
 
 		if ( $this->match_pos === $current_pos ) {
@@ -35,6 +35,6 @@ class CachedRegexp {
 			return $this->matches[0][0] ;
 		}
 
-		return FALSE ;
+		return \false ;
 	}
 }

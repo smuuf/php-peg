@@ -15,7 +15,7 @@ class Sequence extends Token {
 		foreach( $value as $token ) {
 			$code->l(
 				$token->compile()->replace(array(
-					'MATCH' => NULL,
+					'MATCH' => \null,
 					'FAIL' => 'FBREAK'
 				))
 			);

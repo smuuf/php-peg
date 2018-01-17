@@ -14,10 +14,10 @@ class PHPWriter {
 	}
 
 	function function_name( $str ) {
-		$str = preg_replace( '/-/', '_', $str ) ;
-		$str = preg_replace( '/\$/', 'DLR', $str ) ;
-		$str = preg_replace( '/\*/', 'STR', $str ) ;
-		$str = preg_replace( '/[^\w]+/', '', $str ) ;
+		$str = \preg_replace( '/-/', '_', $str ) ;
+		$str = \preg_replace( '/\$/', 'DLR', $str ) ;
+		$str = \preg_replace( '/\*/', 'STR', $str ) ;
+		$str = \preg_replace( '/[^\w]+/', '', $str ) ;
 		return $str ;
 	}
 
@@ -29,7 +29,7 @@ class PHPWriter {
 		);
 	}
 
-	function restore( $id, $remove = FALSE ) {
+	function restore( $id, $remove = \false ) {
 		$code = PHPBuilder::build()
 			->l(
 			'$result = $res'.$id.';',
@@ -44,7 +44,7 @@ class PHPWriter {
 		return $code ;
 	}
 
-	function match_fail_conditional( $on, $match = NULL, $fail = NULL ) {
+	function match_fail_conditional( $on, $match = \null, $fail = \null ) {
 		return PHPBuilder::build()
 			->b( 'if (' . $on . ')',
 			$match,
@@ -61,19 +61,19 @@ class PHPWriter {
 
 		return PHPBuilder::build()
 			->l(
-			'$'.$id.' = NULL;'
+			'$'.$id.' = \null;'
 		)
 			->b( 'do',
 			$code->replace(array(
-				'MBREAK' => '$'.$id.' = TRUE; break;',
-				'FBREAK' => '$'.$id.' = FALSE; break;'
+				'MBREAK' => '$'.$id.' = \true; break;',
+				'FBREAK' => '$'.$id.' = \false; break;'
 			))
 		)
 			->l(
 			'while(0);'
 		)
-			->b( 'if( $'.$id.' === TRUE )', 'MATCH' )
-			->b( 'if( $'.$id.' === FALSE)', 'FAIL'  )
+			->b( 'if( $'.$id.' === \true )', 'MATCH' )
+			->b( 'if( $'.$id.' === \false)', 'FAIL'  )
 			;
 	}
 }

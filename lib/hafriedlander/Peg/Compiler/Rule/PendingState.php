@@ -10,20 +10,20 @@ namespace hafriedlander\Peg\Compiler\Rule;
  */
 class PendingState {
 	function __construct() {
-		$this->what = NULL ;
+		$this->what = \null ;
 	}
 
-	function set( $what, $val = TRUE ) {
+	function set( $what, $val = \true ) {
 		$this->what = $what ;
 		$this->val = $val ;
 	}
 
 	function apply_if_present( $on ) {
-		if ( $this->what !== NULL ) {
+		if ( $this->what !== \null ) {
 			$what = $this->what ;
 			$on->$what = $this->val ;
 
-			$this->what = NULL ;
+			$this->what = \null ;
 		}
 	}
 }

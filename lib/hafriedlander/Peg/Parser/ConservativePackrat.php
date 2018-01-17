@@ -11,7 +11,7 @@ namespace hafriedlander\Peg\Parser;
  */
 class ConservativePackrat extends Basic {
 	function packhas( $key, $pos ) {
-		return isset( $this->packres[$key] ) && $this->packres[$key] !== NULL ;
+		return isset( $this->packres[$key] ) && $this->packres[$key] !== \null ;
 	}
 
 	function packread( $key, $pos ) {
@@ -25,7 +25,7 @@ class ConservativePackrat extends Basic {
 			$this->packpos[$key] = $this->pos ;
 		}
 		else {
-			$this->packres[$key] = NULL ;
+			$this->packres[$key] = \null ;
 		}
 		return $res ;
 	}

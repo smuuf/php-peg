@@ -4,11 +4,11 @@ namespace hafriedlander\Peg;
 
 class Compiler {
 
-	static $parsers = array();
+	static $parsers = [];
 
-	static $debug = false;
+	static $debug = \false;
 
-	static $currentClass = null;
+	static $currentClass = \null;
 
 	static function create_parser( $match ) {
 		/* We allow indenting of the whole rule block, but only to the level of the comment start's indent */
@@ -30,9 +30,9 @@ class Compiler {
 						'/*',
 						'WARNING: This file has been machine generated. Do not edit it, or your changes will be overwritten next time it is compiled.',
 						'*/'
-					)) . PHP_EOL;
+					)) .\PHP_EOL;
 				case '!debug':
-					self::$debug = true;
+					self::$debug = \true;
 					return '';
 			}
 

@@ -16,27 +16,27 @@ class Basic {
 
 		$this->depth = 0 ;
 
-		$this->regexps = array() ;
+		$this->regexps = [] ;
 	}
 
 	function whitespace() {
-		$matched = preg_match( '/[ \t]+/', $this->string, $matches, PREG_OFFSET_CAPTURE, $this->pos ) ;
+		$matched = \preg_match( '/[ \t]+/', $this->string, $matches, \PREG_OFFSET_CAPTURE, $this->pos ) ;
 		if ( $matched && $matches[0][1] == $this->pos ) {
-			$this->pos += strlen( $matches[0][0] );
+			$this->pos += \strlen( $matches[0][0] );
 			return ' ' ;
 		}
-		return FALSE ;
+		return \false ;
 	}
 
 	function literal( $token ) {
 		/* Debugging: * / print( "Looking for token '$token' @ '" . substr( $this->string, $this->pos ) . "'\n" ) ; /* */
-		$toklen = strlen( $token ) ;
-		$substr = substr( $this->string, $this->pos, $toklen ) ;
+		$toklen = \strlen( $token ) ;
+		$substr = \substr( $this->string, $this->pos, $toklen ) ;
 		if ( $substr == $token ) {
 			$this->pos += $toklen ;
 			return $token ;
 		}
-		return FALSE ;
+		return \false ;
 	}
 
 	function rx( $rx ) {
@@ -45,7 +45,7 @@ class Basic {
 	}
 
 	function expression( $result, $stack, $value ) {
-		$stack[] = $result; $rv = false;
+		$stack[] = $result; $rv = \false;
 
 		/* Search backwards through the sub-expression stacks */
 		for ( $i = count($stack) - 1 ; $i >= 0 ; $i-- ) {
@@ -55,22 +55,22 @@ class Basic {
 
 			foreach ($this->typestack($node['_matchrule']) as $type) {
 				$callback = array($this, "{$type}_DLR{$value}");
-				if ( is_callable( $callback ) ) { $rv = call_user_func( $callback ) ; if ($rv !== FALSE) break; }
+				if ( is_callable( $callback ) ) { $rv = call_user_func( $callback ) ; if ($rv !== \false) break; }
 			}
 		}
 
-		if ($rv === false) $rv = @$this->$value;
-		if ($rv === false) $rv = @$this->$value();
+		if ($rv === \false) $rv = @$this->$value;
+		if ($rv === \false) $rv = @$this->$value();
 
 		return is_array($rv) ? $rv['text'] : ($rv ? $rv : '');
 	}
 
 	function packhas( $key, $pos ) {
-		return false ;
+		return \false ;
 	}
 
 	function packread( $key, $pos ) {
-		throw new \Exception('PackRead after PackHas=>false in Parser.php') ;
+		throw new \Exception('PackRead after PackHas=>\false in Parser.php') ;
 	}
 
 	function packwrite( $key, $pos, $res ) {
@@ -82,13 +82,13 @@ class Basic {
 		return $this->$prop;
 	}
 
-	function construct( $matchrule, $name, $arguments = null ) {
+	function construct( $matchrule, $name, $arguments = \null ) {
 		$result = array( '_matchrule' => $matchrule, 'name' => $name, 'text' => '' );
 		if ($arguments) $result = array_merge($result, $arguments) ;
 
 		foreach ($this->typestack($matchrule) as $type) {
 			$callback = array( $this, "{$type}__construct" ) ;
-			if ( is_callable( $callback ) ) {
+			if ( \is_callable( $callback ) ) {
 				call_user_func_array( $callback, array( &$result ) ) ;
 				break;
 			}
@@ -100,7 +100,7 @@ class Basic {
 	function finalise( &$result ) {
 		foreach ($this->typestack($result['_matchrule']) as $type) {
 			$callback = array( $this, "{$type}__finalise" ) ;
-			if ( is_callable( $callback ) ) {
+			if ( \is_callable( $callback ) ) {
 				call_user_func_array( $callback, array( &$result ) ) ;
 				break;
 			}
@@ -109,22 +109,22 @@ class Basic {
 		return $result ;
 	}
 
-	function store ( &$result, $subres, $storetag = NULL ) {
+	function store ( &$result, $subres, $storetag = \null ) {
 		$result['text'] .= $subres['text'] ;
 
-		$storecalled = false;
+		$storecalled = \false;
 
 		foreach ($this->typestack($result['_matchrule']) as $type) {
 			$callback = array( $this, $storetag ? "{$type}_{$storetag}" : "{$type}_{$subres['name']}" ) ;
-			if ( is_callable( $callback ) ) {
+			if ( \is_callable( $callback ) ) {
 				call_user_func_array( $callback, array( &$result, $subres ) ) ;
-				$storecalled = true; break;
+				$storecalled = \true; break;
 			}
 
 			$globalcb = array( $this, "{$type}_STR" ) ;
-			if ( is_callable( $globalcb ) ) {
+			if ( \is_callable( $globalcb ) ) {
 				call_user_func_array( $globalcb, array( &$result, $subres ) ) ;
-				$storecalled = true; break;
+				$storecalled = \true; break;
 			}
 		}
 
