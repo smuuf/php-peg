@@ -5,4 +5,4 @@ require __DIR__ . '/../autoloader.php';
 
 use hafriedlander\Peg\Compiler;
 
-Compiler::cli($_SERVER['argv']);
+Compiler::cli($argv);
