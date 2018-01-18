@@ -47,9 +47,9 @@ class Compiler {
 	static function compile( $string ) {
 		static $rx = '@
 			^([\x20\t]*)/\*!\* (?:[\x20\t]*(!?\w*))?   # Start with some indent, a comment with the special marker, then an optional name
-			((?:[^*]|\*[^/])*?)                        # Any amount of "a character that isnt a star, or a star not followed by a /
+			(.*)                                       # Any character
 			\*/                                        # The comment end
-		@mx';
+		@smx';
 
 		return preg_replace_callback( $rx, array( __CLASS__, 'create_parser' ), $string ) ;
 	}
