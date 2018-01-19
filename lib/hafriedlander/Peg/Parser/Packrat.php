@@ -14,46 +14,35 @@ namespace hafriedlander\Peg\Parser;
 class Packrat extends Basic {
 	function __construct( $string ) {
 		parent::__construct( $string ) ;
-
-		$max = \unpack( 'N', "\x00\xFD\xFF\xFF" ) ;
-		if ( \strlen( $string ) > $max[1] ) user_error( 'Attempting to parse string longer than Packrat Parser can handle', E_USER_ERROR ) ;
-
-		$this->packstatebase = \str_repeat( "\xFF", \strlen( $string )*3 ) ;
-		$this->packstate = [] ;
-		$this->packres = [] ;
+		$this->packres = [];
+		$this->packpos = [];
 	}
 
-	function packhas( $key, $pos ) {
-		$pos *= 3 ;
-		return isset( $this->packstate[$key] ) && $this->packstate[$key][$pos] != "\xFF" ;
+	function packhas($key, $pos) {
+		return !empty($this->packres[$key][$pos]);
 	}
 
-	function packread( $key, $pos ) {
-		$pos *= 3 ;
-		if ( $this->packstate[$key][$pos] == "\xFE" ) return \false ;
+	function packread($key, $pos) {
 
-		$this->pos = \ord($this->packstate[$key][$pos]) << 16 | \ord($this->packstate[$key][$pos+1]) << 8 | \ord($this->packstate[$key][$pos+2]) ;
-		return $this->packres["$key:$pos"] ;
-	}
-
-	function packwrite( $key, $pos, $res ) {
-		if ( !isset( $this->packstate[$key] ) ) $this->packstate[$key] = $this->packstatebase ;
-
-		$pos *= 3 ;
-
-		if ( $res !== \false ) {
-			$i = \pack( 'N', $this->pos ) ;
-
-			$this->packstate[$key][$pos]   = $i[1] ;
-			$this->packstate[$key][$pos+1] = $i[2] ;
-			$this->packstate[$key][$pos+2] = $i[3] ;
-
-			$this->packres["$key:$pos"] = $res ;
-		}
-		else {
-			$this->packstate[$key][$pos] = "\xFE" ;
+		if (!isset($this->packres[$key][$pos])) {
+			return false;
 		}
 
-		return $res ;
+		$this->pos = $this->packpos[$key][$pos];
+		return $this->packres[$key][$pos];
+
+	}
+
+	function packwrite($key, $pos, $res) {
+
+		if ($res !== \false) {
+			$this->packres[$key][$pos] = $res;
+			$this->packpos[$key][$pos] = $this->pos;
+		} else {
+			$this->packres[$key][$pos] = false;
+		}
+
+		return $res;
+
 	}
 }
