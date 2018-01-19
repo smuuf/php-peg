@@ -6,16 +6,25 @@ namespace hafriedlander\Peg\Parser;
  * By inheriting from Packrat instead of Parser, the parser will run in linear time (instead of exponential like
  * Parser), but will require a lot more memory, since every match-attempt at every position is memorised.
  *
- * We now use a string as a byte-array to store position information rather than a straight array for memory reasons. This
- * means there is a (roughly) 8MB limit on the size of the string we can parse
+ * Originally a single string was used as a storage for memoizing parser results.
+ * This approach is now abandoned in favor of true PHP arrays, which now seem to be a better choice, since PHP 7.0
+ * optimized internal workings of PHP arrays. It seems that using array as a storage actually has lower memory
+ * footprint than the original "string" implementation.
  *
+ * This refactoring also significantly simplified the packrat parser's code.
+ *
+ * @author Premysl Karbula
  * @author Hamish Friedlander
  */
 class Packrat extends Basic {
-	function __construct( $string ) {
-		parent::__construct( $string ) ;
+
+	function __construct($string) {
+
+		parent::__construct($string) ;
+
 		$this->packres = [];
 		$this->packpos = [];
+
 	}
 
 	function packhas($key, $pos) {
@@ -25,7 +34,7 @@ class Packrat extends Basic {
 	function packread($key, $pos) {
 
 		if (!isset($this->packres[$key][$pos])) {
-			return false;
+			return \false;
 		}
 
 		$this->pos = $this->packpos[$key][$pos];
@@ -33,16 +42,16 @@ class Packrat extends Basic {
 
 	}
 
-	function packwrite($key, $pos, $res) {
+	function packwrite($key, $pos, $result) {
 
-		if ($res !== \false) {
-			$this->packres[$key][$pos] = $res;
+		if ($result !== \false) {
+			$this->packres[$key][$pos] = $result;
 			$this->packpos[$key][$pos] = $this->pos;
 		} else {
-			$this->packres[$key][$pos] = false;
+			$this->packres[$key][$pos] = \false;
 		}
 
-		return $res;
+		return $result;
 
 	}
 }
