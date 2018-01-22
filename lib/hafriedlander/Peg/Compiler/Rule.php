@@ -135,7 +135,7 @@ class Rule extends PHPWriter {
 		((\\\\\\\\)*\\\\/) # Escaped \/, making sure to catch all the \\ first, so that we dont think \\/ is an escaped /
 		|
 		[^/]               # Anything except /
-	)*/@xu' ;
+	)*/[a-zA-Z]*@xu' ;
 
 	function tokenize( $str, &$tokens, $o = 0 ) {
 		$length = strlen($str);
@@ -260,7 +260,7 @@ class Rule extends PHPWriter {
 						return $o ;
 
 					default:
-						user_error( "Can't parser $c - attempting to skip", E_USER_WARNING ) ;
+						user_error( "Can't parse '$c' - attempting to skip", E_USER_WARNING ) ;
 				}
 			}
 		}
