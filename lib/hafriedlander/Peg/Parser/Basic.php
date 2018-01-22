@@ -83,7 +83,10 @@ class Basic {
 	}
 
 	function construct( $matchrule, $name, $arguments = \null ) {
+
 		$result = array( '_matchrule' => $matchrule, 'name' => $name, 'text' => '' );
+		$result['offset'] = $this->pos;
+
 		if ($arguments) $result = array_merge($result, $arguments) ;
 
 		foreach ($this->typestack($matchrule) as $type) {
