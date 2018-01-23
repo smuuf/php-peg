@@ -17,12 +17,15 @@ class CachedRegexp {
 		"x", // Ignore extra whitespace.
 	];
 
+	public $modifiers = [];
+
 	function __construct($parser, $rx) {
 
 		$this->parser = $parser;
 
 		$modifiers = \str_split(\substr($rx, \strrpos($rx, '/') + 1));
-		$this->rx = $rx . \implode('', self::DEFAULT_MODIFIERS + $modifiers);
+		$this->modifiers = array_unique(array_merge(self::DEFAULT_MODIFIERS, $modifiers));
+		$this->rx = $rx . \implode('', $this->modifiers);
 
 		$this->matches = \null;
 		$this->match_pos = \null; // \null is no-match-to-end-of-string, unless check_pos also == \null, in which case means undefined.

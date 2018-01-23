@@ -101,6 +101,7 @@ class Basic {
 	}
 
 	function finalise( &$result ) {
+
 		foreach ($this->typestack($result['_matchrule']) as $type) {
 			$callback = array( $this, "{$type}__finalise" ) ;
 			if ( \is_callable( $callback ) ) {
@@ -113,8 +114,8 @@ class Basic {
 	}
 
 	function store ( &$result, $subres, $storetag = \null ) {
-		$result['text'] .= $subres['text'] ;
 
+		$result['text'] .= $subres['text'];
 		$storecalled = \false;
 
 		foreach ($this->typestack($result['_matchrule']) as $type) {
@@ -130,7 +131,6 @@ class Basic {
 				$storecalled = \true; break;
 			}
 		}
-
 		if ( $storetag && !$storecalled ) {
 			if ( !isset( $result[$storetag] ) ) $result[$storetag] = $subres ;
 			else {
