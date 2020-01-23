@@ -132,7 +132,7 @@ abstract class Token extends PHPWriter {
 	{
 		$counterName = '$count' . $id;
 		return PHPBuilder::build()->l(
-            $counterName . ' = 0;'
+			$counterName . ' = 0;'
 		)->b(
 			'while (\true)',
 			$this->save($id),
@@ -140,7 +140,7 @@ abstract class Token extends PHPWriter {
 				'MATCH' => \null,
 				'FAIL' => $this->restore($id, \true)->l('break;')
 			)),
-            $counterName . '++;'
+			$counterName . '++;'
 		)->b(
 			'if (' . $counterName . ' >= '.$n.')',
 			'MATCH'
@@ -154,9 +154,9 @@ abstract class Token extends PHPWriter {
 	{
 		if(1 === $min && 1 === $max) return $code;
         
-        $counterName = '$count' . $id;
+		$counterName = '$count' . $id;
 		return PHPBuilder::build()->l(
-            $counterName . ' = 0;'
+			$counterName . ' = 0;'
 		)->b(
 			'while (' . $counterName . ' < '.$max.')',
 			$this->save($id),
@@ -164,7 +164,7 @@ abstract class Token extends PHPWriter {
 				'MATCH' => \null,
 				'FAIL' => $this->restore($id, \true)->l('break;')
 			)),
-            $counterName . '++;'
+			$counterName . '++;'
 		)->b(
 			'if (' . $counterName . ' >= '.$min.')',
 			'MATCH'
