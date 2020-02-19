@@ -130,8 +130,9 @@ abstract class Token extends PHPWriter {
 
 	protected function n_or_more($code, $id, $n)
 	{
+		$counterName = '$count' . $id;
 		return PHPBuilder::build()->l(
-			'$count = 0;'
+			$counterName . ' = 0;'
 		)->b(
 			'while (\true)',
 			$this->save($id),
@@ -139,9 +140,9 @@ abstract class Token extends PHPWriter {
 				'MATCH' => \null,
 				'FAIL' => $this->restore($id, \true)->l('break;')
 			)),
-			'$count++;'
+			$counterName . '++;'
 		)->b(
-			'if ($count >= '.$n.')',
+			'if (' . $counterName . ' >= '.$n.')',
 			'MATCH'
 		)->b(
 			'else',
@@ -152,19 +153,20 @@ abstract class Token extends PHPWriter {
 	protected function n_to_x($code, $id, $min, $max)
 	{
 		if(1 === $min && 1 === $max) return $code;
-
+        
+		$counterName = '$count' . $id;
 		return PHPBuilder::build()->l(
-			'$count = 0;'
+			$counterName . ' = 0;'
 		)->b(
-			'while ($count < '.$max.')',
+			'while (' . $counterName . ' < '.$max.')',
 			$this->save($id),
 			$code->replace(array(
 				'MATCH' => \null,
 				'FAIL' => $this->restore($id, \true)->l('break;')
 			)),
-			'$count++;'
+			$counterName . '++;'
 		)->b(
-			'if ($count >= '.$min.')',
+			'if (' . $counterName . ' >= '.$min.')',
 			'MATCH'
 		)->b(
 			'else',
