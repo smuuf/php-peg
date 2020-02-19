@@ -33,11 +33,11 @@ class Compiler {
 					)) .\PHP_EOL;
 				case '!debug':
 					self::$debug = \true;
-					return '';
-			}
+					break;
+				}
 
-			throw new \Exception("Unknown pragma $class encountered when compiling parser");
-		}
+				throw new \Exception("Unknown pragma $class encountered when compiling parser");
+			}
 
 		if (!isset(self::$parsers[$class])) self::$parsers[$class] = new Compiler\RuleSet();
 

@@ -15,7 +15,7 @@ abstract class Expressionable extends Terminal {
 	}
 
 	function match_code( $value ) {
-		$value = preg_replace_callback(self::$expression_rx, array($this, 'expression_replace'), $value);
+		$value = \preg_replace_callback(self::$expression_rx, [$this, 'expression_replace'], $value);
 		return parent::match_code($value);
 	}
 }

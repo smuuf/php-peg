@@ -7,7 +7,7 @@ use hafriedlander\Peg\Compiler\PHPBuilder;
 
 class Option extends Token {
 	function __construct( $opt1, $opt2 ) {
-		parent::__construct( 'option', array( $opt1, $opt2 ) ) ;
+		parent::__construct( 'option', [$opt1, $opt2] ) ;
 	}
 
 	function match_code( $value ) {
@@ -19,10 +19,10 @@ class Option extends Token {
 
 		foreach ( $value as $opt ) {
 			$code->l(
-				$opt->compile()->replace(array(
+				$opt->compile()->replace([
 					'MATCH' => 'MBREAK',
 					'FAIL' => \null
-				)),
+				]),
 				$this->restore($id)
 			);
 		}

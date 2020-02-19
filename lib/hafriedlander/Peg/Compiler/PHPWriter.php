@@ -64,10 +64,10 @@ class PHPWriter {
 			'$'.$id.' = \null;'
 		)
 			->b( 'do',
-			$code->replace(array(
+			$code->replace([
 				'MBREAK' => '$'.$id.' = \true; break;',
 				'FBREAK' => '$'.$id.' = \false; break;'
-			))
+			])
 		)
 			->l(
 			'while(0);'

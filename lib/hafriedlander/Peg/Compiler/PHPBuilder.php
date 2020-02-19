@@ -107,7 +107,7 @@ class PHPBuilder {
 		$out = [] ;
 		foreach( $array as $line ) {
 			if ( \is_array( $line ) ) {
-				list( $entry, $block ) = $line ;
+				[$entry, $block] = $line ;
 				$str = $this->render( $block, $indent . "\t" ) ;
 
 				if ( \strlen( $str ) < 40 ) {

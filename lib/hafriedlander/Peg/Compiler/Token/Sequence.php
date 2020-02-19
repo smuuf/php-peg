@@ -14,10 +14,10 @@ class Sequence extends Token {
 		$code = PHPBuilder::build() ;
 		foreach( $value as $token ) {
 			$code->l(
-				$token->compile()->replace(array(
+				$token->compile()->replace([
 					'MATCH' => \null,
 					'FAIL' => 'FBREAK'
-				))
+				])
 			);
 		}
 		$code->l( 'MBREAK' );

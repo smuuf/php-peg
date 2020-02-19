@@ -62,13 +62,13 @@ class Rule extends PHPWriter {
 
 		// Parse out the spec
 		$spec = \implode("\n", $spec);
-		if (!\preg_match(self::$rule_rx, $spec, $specmatch)) user_error('Malformed rule spec ' . $spec, E_USER_ERROR);
+		if (!\preg_match(self::$rule_rx, $spec, $specmatch)) \user_error('Malformed rule spec ' . $spec, E_USER_ERROR);
 
 		$this->name = $specmatch['name'];
 
 		if ($specmatch['extends']) {
 			$this->extends = $this->parser->rules[$specmatch['extends']];
-			if (!$this->extends) user_error('Extended rule '.$specmatch['extends'].' is not defined before being extended', E_USER_ERROR);
+			if (!$this->extends) \user_error('Extended rule '.$specmatch['extends'].' is not defined before being extended', E_USER_ERROR);
 		}
 
 		$this->arguments = [];
@@ -138,70 +138,70 @@ class Rule extends PHPWriter {
 	)*/[a-zA-Z]*@xu' ;
 
 	function tokenize( $str, &$tokens, $o = 0 ) {
-		$length = strlen($str);
+		$length = \strlen($str);
 		$pending = new Rule\PendingState() ;
 
 		while ( $o < $length ) {
 
 			/* Absorb white-space */
 			if ( \preg_match( '/\G\s+/', $str, $match, 0, $o ) ) {
-				$o += strlen( $match[0] ) ;
+				$o += \strlen( $match[0] ) ;
 			}
 			/* Handle expression labels */
 			elseif ( \preg_match( '/\G(\w*):/', $str, $match, 0, $o ) ) {
 				$pending->set( 'tag', isset( $match[1] ) ? $match[1] : '' ) ;
-				$o += strlen( $match[0] ) ;
+				$o += \strlen( $match[0] ) ;
 			}
 			/* Handle descent token */
 			elseif ( \preg_match( '/\G[\w-]+/', $str, $match, 0, $o ) ) {
 				$tokens[] = $t = new Token\Recurse( $match[0] ) ;
 				$pending->apply_if_present( $t ) ;
-				$o += strlen( $match[0] ) ;
+				$o += \strlen( $match[0] ) ;
 			}
 			/* Handle " quoted literals */
 			elseif ( \preg_match( '/\G"[^"]*"/', $str, $match, 0, $o ) ) {
 				$tokens[] = $t = new Token\Literal( $match[0] ) ;
 				$pending->apply_if_present( $t ) ;
-				$o += strlen( $match[0] ) ;
+				$o += \strlen( $match[0] ) ;
 			}
 			/* Handle ' quoted literals */
 			elseif ( \preg_match( "/\G'[^']*'/", $str, $match, 0, $o ) ) {
 				$tokens[] = $t = new Token\Literal( $match[0] ) ;
 				$pending->apply_if_present( $t ) ;
-				$o += strlen( $match[0] ) ;
+				$o += \strlen( $match[0] ) ;
 			}
 			/* Handle regexs */
 			elseif ( \preg_match( self::$rx_rx, $str, $match, 0, $o ) ) {
 				$tokens[] = $t = new Token\Regex( $match[0] ) ;
 				$pending->apply_if_present( $t ) ;
-				$o += strlen( $match[0] ) ;
+				$o += \strlen( $match[0] ) ;
 			}
 			/* Handle $ call literals */
 			elseif ( \preg_match( '/\G\$(\w+)/', $str, $match, 0, $o ) ) {
 				$tokens[] = $t = new Token\ExpressionedRecurse( $match[1] ) ;
 				$pending->apply_if_present( $t ) ;
-				$o += strlen( $match[0] ) ;
+				$o += \strlen( $match[0] ) ;
 			}
 			/* Handle flags */
 			elseif ( \preg_match( '/\G\@(\w+)/', $str, $match, 0, $o ) ) {
 				$l = \count( $tokens ) - 1 ;
-				$o += strlen( $match[0] ) ;
-				user_error( "TODO: Flags not currently supported", E_USER_WARNING ) ;
+				$o += \strlen( $match[0] ) ;
+				\user_error( "TODO: Flags not currently supported", E_USER_WARNING ) ;
 			}
 			/* Handle control tokens */
 			else {
-				$c = substr( $str, $o, 1 ) ;
+				$c = \substr( $str, $o, 1 ) ;
 				$l = \count( $tokens ) - 1 ;
 				$o += 1 ;
 				switch( $c ) {
 					case '?':
-						$tokens[$l]->quantifier = array('min' => 0, 'max' => 1);
+						$tokens[$l]->quantifier = ['min' => 0, 'max' => 1];
 						break ;
 					case '*':
-						$tokens[$l]->quantifier = array('min' => 0, 'max' => \null);
+						$tokens[$l]->quantifier = ['min' => 0, 'max' => \null];
 						break ;
 					case '+':
-						$tokens[$l]->quantifier = array('min' => 1, 'max' => \null);
+						$tokens[$l]->quantifier = ['min' => 1, 'max' => \null];
 						break ;
 					case '{':
 						if (\preg_match('/\G\{([0-9]+)(,([0-9]*))?\}/', $str, $matches, 0, $o - 1)) {
@@ -209,8 +209,8 @@ class Rule extends PHPWriter {
 							if(isset($matches[2])) {
 								$max = $matches[3] ? (int) $matches[3] : \null;
 							}
-							$tokens[$l]->quantifier = array('min' => $min, 'max' => $max);
-							$o += strlen($matches[0]) - 1;
+							$tokens[$l]->quantifier = ['min' => $min, 'max' => $max];
+							$o += \strlen($matches[0]) - 1;
 						} else {
 							throw new \Exception(sprintf(
 								"Unknown quantifier: %s",
@@ -256,11 +256,11 @@ class Rule extends PHPWriter {
 
 						$pending->apply_if_present( $option2 ) ;
 
-						$tokens = array( new Token\Option( $option1, $option2 ) ) ;
+						$tokens = [new Token\Option( $option1, $option2 )] ;
 						return $o ;
 
 					default:
-						user_error( "Can't parse '$c' - attempting to skip", E_USER_WARNING ) ;
+						\user_error( "Can't parse '$c' - attempting to skip", E_USER_WARNING ) ;
 				}
 			}
 		}
@@ -281,16 +281,16 @@ class Rule extends PHPWriter {
 		}
 		while($class = $class->extends);
 
-		$typestack = "array('" . \implode("','", $typestack) . "')";
+		$typestack = "['" . \implode("','", $typestack) . "']";
 
 		// Build an array of additional arguments to add to result node (if any)
 		if (empty($this->arguments)) {
 			$arguments = '\null';
 		}
 		else {
-			$arguments = "array(";
+			$arguments = "[";
 			foreach ($this->arguments as $k=>$v) { $arguments .= "'$k' => '$v', "; }
-			$arguments .= ")";
+			$arguments .= "]";
 		}
 
 		$match = PHPBuilder::build() ;
@@ -298,7 +298,7 @@ class Rule extends PHPWriter {
 		$match->l("protected \$match_{$function_name}_typestack = $typestack;");
 
 		$match->b( "function match_{$function_name} (\$stack = [])",
-			'$matchrule = "'.$function_name.'"; $result = $this->construct($matchrule, $matchrule, '.$arguments.');',
+			'$matchrule = "'.$function_name.'"; $result = $this->construct($matchrule, $matchrule, '.$arguments.');$newStack = \array_merge($stack, [$result]);',
 			$this->parsed->compile()->replace(array(
 				'MATCH' => 'return $this->finalise($result);',
 				'FAIL' => 'return \false;'

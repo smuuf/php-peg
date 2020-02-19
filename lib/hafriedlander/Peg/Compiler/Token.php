@@ -62,35 +62,35 @@ abstract class Token extends PHPWriter {
 			$code = PHPBuilder::build()
 				->l(
 				$this->save($id),
-				$code->replace( array(
+				$code->replace([
 					'MATCH' =>
 					$this->restore($id)
 						->l( 'MATCH' ),
 					'FAIL' =>
 					$this->restore($id)
 						->l( 'FAIL' )
-				)));
+				]));
 		}
 
 		if ( $this->negative_lookahead ) {
 			$code = PHPBuilder::build()
 				->l(
 				$this->save($id),
-				$code->replace( array(
+				$code->replace([
 					'MATCH' =>
 					$this->restore($id)
 						->l( 'FAIL' ),
 					'FAIL' =>
 					$this->restore($id)
 						->l( 'MATCH' )
-				)));
+				]));
 		}
 
 		if ( $this->tag && !($this instanceof Token\Recurse ) ) {
 			$code = PHPBuilder::build()
 				->l(
-				'$stack[] = $result; $result = $this->construct( $matchrule, "'.$this->tag.'" ); ',
-				$code->replace(array(
+				'$stack[] = $result; $result = $this->construct( $matchrule, "'.$this->tag.'" );',
+				$code->replace([
 					'MATCH' => PHPBuilder::build()
 						->l(
 						'$subres = $result; $result = \array_pop($stack);',
@@ -102,7 +102,7 @@ abstract class Token extends PHPWriter {
 						'$result = \array_pop($stack);',
 						'FAIL'
 					)
-				)));
+				]));
 		}
 
 		return $code ;
