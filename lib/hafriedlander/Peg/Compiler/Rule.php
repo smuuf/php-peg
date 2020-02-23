@@ -298,7 +298,7 @@ class Rule extends PHPWriter {
 		$match->l("protected \$match_{$function_name}_typestack = $typestack;");
 
 		$match->b( "function match_{$function_name} (\$stack = [])",
-			'$matchrule = "'.$function_name.'"; $result = $this->construct($matchrule, $matchrule, '.$arguments.');$newStack = \array_merge($stack, [$result]);',
+			'$matchrule = "'.$function_name.'"; $result = $this->construct($matchrule, $matchrule, '.$arguments.'); $newStack = \array_merge($stack, [$result]);',
 			$this->parsed->compile()->replace(array(
 				'MATCH' => 'return $this->finalise($result);',
 				'FAIL' => 'return \false;'

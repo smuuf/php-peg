@@ -24,7 +24,7 @@ class CachedRegexp {
 		$this->parser = $parser;
 
 		$modifiers = \str_split(\substr($rx, \strrpos($rx, '/') + 1));
-		$this->modifiers = array_unique(array_merge(self::DEFAULT_MODIFIERS, $modifiers));
+		$this->modifiers = \array_unique(\array_merge(self::DEFAULT_MODIFIERS, $modifiers));
 		$this->rx = $rx . \implode('', $this->modifiers);
 
 		$this->matches = \null;
@@ -51,7 +51,7 @@ class CachedRegexp {
 		}
 
 		if ($this->match_pos === $current_pos) {
-			$this->parser->pos += strlen($this->matches[0][0]);
+			$this->parser->pos += \strlen($this->matches[0][0]);
 			return $this->matches[0][0];
 		}
 

@@ -21,22 +21,22 @@ class Recurse extends Token {
 		if ( \hafriedlander\Peg\Compiler::$debug ) {
 			$debug_header = PHPBuilder::build()
 				->l(
-				'$indent = str_repeat( "\e[90m| \e[0m", $this->depth / 2);',
+				'$indent = str_repeat("\e[90m| \e[0m", $this->depth / 2);',
 				'$this->depth += 2;',
-				'$sub = ( strlen( $this->string ) - $this->pos > 40 ) ? ( substr( $this->string, $this->pos, 40 ) . "..." ) : substr( $this->string, $this->pos );',
-				'$sub = preg_replace( \'/(\r|\n)+/\', " {NL} ", $sub );',
-				sprintf('print( $indent."Matching \e[32m%s\e[0m \"\e[36m".$sub."\e[0m\" \n" );', trim($function, "'"))
+				'$sub = (strlen( $this->string ) - $this->pos > 40) ? substr($this->string, $this->pos, 40) . "...") : substr($this->string, $this->pos);',
+				'$sub = preg_replace(\'/(\r|\n)+/\', " {NL} ", $sub);',
+				sprintf('print $indent . "Matching \e[32m%s\e[0m \"\e[36m".$sub."\e[0m\" \n";', trim($function, "'"))
 			);
 
 			$debug_match = PHPBuilder::build()
 				->l(
-				'print( $indent."\e[1m\e[42mOK\n\e[0m" );',
+				'print $indent . "\e[1m\e[42mOK\n\e[0m";',
 				'$this->depth -= 2;'
 			);
 
 			$debug_fail = PHPBuilder::build()
 				->l(
-				'print( $indent."-\n" );',
+				'print $indent . "-\n";',
 				'$this->depth -= 2;'
 			);
 		}
@@ -52,8 +52,8 @@ class Recurse extends Token {
 				PHPBuilder::build()->l(
 					$debug_match,
 					$this->tag === \false ?
-						'$this->store( $result, $subres );' :
-						'$this->store( $result, $subres, "'.$storetag.'" );'
+						'$this->store($result, $subres);' :
+						'$this->store($result, $subres, "'.$storetag.'");'
 				),
 				PHPBuilder::build()->l(
 					$debug_fail

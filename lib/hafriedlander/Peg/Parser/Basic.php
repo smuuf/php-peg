@@ -48,21 +48,21 @@ class Basic {
 		$stack[] = $result; $rv = \false;
 
 		/* Search backwards through the sub-expression stacks */
-		for ( $i = count($stack) - 1 ; $i >= 0 ; $i-- ) {
+		for ( $i = \count($stack) - 1 ; $i >= 0 ; $i-- ) {
 			$node = $stack[$i];
 
 			if ( isset($node[$value]) ) { $rv = $node[$value]; break; }
 
 			foreach ($this->typestack($node['_matchrule']) as $type) {
 				$callback = array($this, "{$type}_DLR{$value}");
-				if ( is_callable( $callback ) ) { $rv = call_user_func( $callback ) ; if ($rv !== \false) break; }
+				if ( is_callable( $callback ) ) { $rv = \call_user_func( $callback ) ; if ($rv !== \false) break; }
 			}
 		}
 
 		if ($rv === \false) $rv = @$this->$value;
 		if ($rv === \false) $rv = @$this->$value();
 
-		return is_array($rv) ? $rv['text'] : ($rv ? $rv : '');
+		return \is_array($rv) ? $rv['text'] : ($rv ? $rv : '');
 	}
 
 	function packhas( $key, $pos ) {
@@ -92,7 +92,7 @@ class Basic {
 		foreach ($this->typestack($matchrule) as $type) {
 			$callback = array( $this, "{$type}__construct" ) ;
 			if ( \is_callable( $callback ) ) {
-				call_user_func_array( $callback, array( &$result ) ) ;
+				\call_user_func_array( $callback, array( &$result ) ) ;
 				break;
 			}
 		}
@@ -105,7 +105,7 @@ class Basic {
 		foreach ($this->typestack($result['_matchrule']) as $type) {
 			$callback = array( $this, "{$type}__finalise" ) ;
 			if ( \is_callable( $callback ) ) {
-				call_user_func_array( $callback, array( &$result ) ) ;
+				\call_user_func_array( $callback, array( &$result ) ) ;
 				break;
 			}
 		}
@@ -121,13 +121,13 @@ class Basic {
 		foreach ($this->typestack($result['_matchrule']) as $type) {
 			$callback = array( $this, $storetag ? "{$type}_{$storetag}" : "{$type}_{$subres['name']}" ) ;
 			if ( \is_callable( $callback ) ) {
-				call_user_func_array( $callback, array( &$result, $subres ) ) ;
+				\call_user_func_array( $callback, array( &$result, $subres ) ) ;
 				$storecalled = \true; break;
 			}
 
 			$globalcb = array( $this, "{$type}_STR" ) ;
 			if ( \is_callable( $globalcb ) ) {
-				call_user_func_array( $globalcb, array( &$result, $subres ) ) ;
+				\call_user_func_array( $globalcb, array( &$result, $subres ) ) ;
 				$storecalled = \true; break;
 			}
 		}

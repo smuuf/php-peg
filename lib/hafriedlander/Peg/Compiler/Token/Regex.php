@@ -2,8 +2,6 @@
 
 namespace hafriedlander\Peg\Compiler\Token;
 
-use hafriedlander\Peg\Compiler\PHPBuilder;
-
 class Regex extends Expressionable {
 	static function escape( $rx ) {
 		$rx = \str_replace( "'", "\\'", $rx ) ;
