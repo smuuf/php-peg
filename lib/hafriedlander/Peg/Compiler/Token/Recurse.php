@@ -47,7 +47,7 @@ class Recurse extends Token {
 		return PHPBuilder::build()->l(
 			'$matcher = \'match_\'.'.$function.'; $key = $matcher; $pos = $this->pos;',
 			$debug_header,
-			'$subres = ( $this->packhas( $key, $pos ) ? $this->packread( $key, $pos ) : $this->packwrite( $key, $pos, $this->$matcher(\array_merge($stack, array($result))) ) );',
+			'$subres = $this->packhas($key, $pos) ? $this->packread($key, $pos) : $this->packwrite($key, $pos, $this->$matcher($newStack));',
 			$this->match_fail_conditional( '$subres !== \false',
 				PHPBuilder::build()->l(
 					$debug_match,
