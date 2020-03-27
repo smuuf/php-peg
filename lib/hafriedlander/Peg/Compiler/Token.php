@@ -153,7 +153,7 @@ abstract class Token extends PHPWriter {
 	protected function n_to_x($code, $id, $min, $max)
 	{
 		if(1 === $min && 1 === $max) return $code;
-        
+
 		$counterName = '$count' . $id;
 		return PHPBuilder::build()->l(
 			$counterName . ' = 0;'

@@ -4,6 +4,8 @@ namespace hafriedlander\Peg\Compiler;
 
 class PHPBuilder {
 
+	public $needsStack = false;
+
 	static function build () {
 		return new PHPBuilder();
 	}
@@ -12,30 +14,50 @@ class PHPBuilder {
 		$this->lines = [];
 	}
 
-	function l() {
-		foreach (\func_get_args() as $lines) {
-			if (!$lines) continue;
+	function l(...$args) {
 
-			if (is_string($lines)) $lines = preg_split('/\r\n|\r|\n/', $lines);
-			if (!$lines) continue;
+		foreach ($args as $lines) {
 
-			if ($lines instanceof PHPBuilder) $lines = $lines->lines;
-			else                                $lines = \array_map('ltrim', $lines);
-			if (!$lines) continue;
+			if (!$lines) {
+				continue;
+			}
+
+			if (is_string($lines)) {
+				$lines = preg_split('/\r\n|\r|\n/', $lines);
+			}
+
+			if ($lines instanceof PHPBuilder) {
+				if ($lines->needsStack) {
+					$this->needsStack = true;
+				}
+				$lines = $lines->lines;
+			} else {
+				$lines = \array_map('rtrim', $lines);
+			}
+
+			if (!$lines) {
+				continue;
+			}
 
 			$this->lines = \array_merge($this->lines, $lines);
+
 		}
+
 		return $this;
 	}
 
-	function b() {
-		$args = \func_get_args();
+	function b(...$args) {
+
 		$entry = \array_shift($args);
 
 		$block = new PHPBuilder();
-		call_user_func_array(array($block, 'l'), $args);
+		$block->l(...$args);
 
-		$this->lines[] = array($entry, $block->lines);
+		if ($block->needsStack) {
+			$this->needsStack = true;
+		}
+
+		$this->lines[] = [$entry, $block->lines];
 
 		return $this;
 	}

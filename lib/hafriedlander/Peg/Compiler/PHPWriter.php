@@ -7,73 +7,76 @@ namespace hafriedlander\Peg\Compiler;
  */
 class PHPWriter {
 
-	static $varid = 0 ;
+	public static $varid = 0;
 
-	function varid() {
-		return '_' . (self::$varid++) ;
+	public function varid() {
+		return '_' . (self::$varid++);
 	}
 
-	function function_name( $str ) {
-		$str = \preg_replace( '/-/', '_', $str ) ;
-		$str = \preg_replace( '/\$/', 'DLR', $str ) ;
-		$str = \preg_replace( '/\*/', 'STR', $str ) ;
-		$str = \preg_replace( '/[^\w]+/', '', $str ) ;
-		return $str ;
+	public function function_name($str) {
+		$str = \preg_replace('/-/', '_', $str);
+		$str = \preg_replace('/\$/', 'DLR', $str);
+		$str = \preg_replace('/\*/', 'STR', $str);
+		$str = \preg_replace('/[^\w]+/', '', $str);
+		return $str;
 	}
 
-	function save($id) {
+	public function save($id) {
 		return PHPBuilder::build()
 			->l(
-			'$res'.$id.' = $result;',
-			'$pos'.$id.' = $this->pos;'
-		);
+				'$res' . $id . ' = $result;',
+				'$pos' . $id . ' = $this->pos;'
+			);
 	}
 
-	function restore( $id, $remove = \false ) {
+	public function restore($id, $remove = \false) {
 		$code = PHPBuilder::build()
 			->l(
-			'$result = $res'.$id.';',
-			'$this->pos = $pos'.$id.';'
-		);
+				'$result = $res' . $id . ';',
+				'$this->pos = $pos' . $id . ';'
+			);
 
-		if ( $remove ) $code->l(
-			'unset( $res'.$id.' );',
-			'unset( $pos'.$id.' );'
-		);
+		if ($remove) {
+			$code->l(
+				'unset($res' . $id . ', $pos' . $id . ');'
+			);
+		}
 
-		return $code ;
+		return $code;
 	}
 
-	function match_fail_conditional( $on, $match = \null, $fail = \null ) {
+	public function match_fail_conditional($on, $match = \null, $fail = \null) {
 		return PHPBuilder::build()
-			->b( 'if (' . $on . ')',
-			$match,
-			'MATCH'
-		)
-			->b( 'else',
-			$fail,
-			'FAIL'
-		);
+			->b(
+				'if (' . $on . ')',
+				$match,
+				'MATCH'
+			)
+			->b(
+				'else',
+				$fail,
+				'FAIL'
+			);
 	}
 
-	function match_fail_block( $code ) {
-		$id = $this->varid() ;
+	public function match_fail_block($code) {
+		$id = $this->varid();
 
 		return PHPBuilder::build()
 			->l(
-			'$'.$id.' = \null;'
-		)
-			->b( 'do',
-			$code->replace([
-				'MBREAK' => '$'.$id.' = \true; break;',
-				'FBREAK' => '$'.$id.' = \false; break;'
-			])
-		)
+				'$' . $id . ' = \null;'
+			)
+			->b(
+				'do',
+				$code->replace([
+					'MBREAK' => '$' . $id . ' = \true; break;',
+					'FBREAK' => '$' . $id . ' = \false; break;'
+				])
+			)
 			->l(
-			'while(0);'
-		)
-			->b( 'if( $'.$id.' === \true )', 'MATCH' )
-			->b( 'if( $'.$id.' === \false)', 'FAIL'  )
-			;
+				'while(false);'
+			)
+			->b('if( $' . $id . ' === \true )', 'MATCH')
+			->b('if( $' . $id . ' === \false)', 'FAIL');
 	}
 }

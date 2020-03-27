@@ -12,20 +12,16 @@ namespace hafriedlander\Peg\Parser;
  */
 class CachedRegexp {
 
-	const DEFAULT_MODIFIERS = [
-		"S", // Extra analysis is performed.
-		"x", // Ignore extra whitespace.
-	];
+	// S: Extra analysis is performed.
+	// x: Ignore extra whitespace.
+	const DEFAULT_MODIFIERS = 'Sx';
 
-	public $modifiers = [];
-
-	function __construct($parser, $rx) {
+	public function __construct($parser, $rx) {
 
 		$this->parser = $parser;
-
-		$modifiers = \str_split(\substr($rx, \strrpos($rx, '/') + 1));
-		$this->modifiers = \array_unique(\array_merge(self::DEFAULT_MODIFIERS, $modifiers));
-		$this->rx = $rx . \implode('', $this->modifiers);
+		// Modifiers can be specified multiple times, so no need to check for
+		// uniqueness.
+		$this->rx = $rx . self::DEFAULT_MODIFIERS;
 
 		$this->matches = \null;
 		$this->match_pos = \null; // \null is no-match-to-end-of-string, unless check_pos also == \null, in which case means undefined.
@@ -33,12 +29,13 @@ class CachedRegexp {
 
 	}
 
-	function match() {
+	public function match() {
 		$current_pos = $this->parser->pos;
-		$dirty = $this->check_pos === \null || $this->check_pos > $current_pos || ($this->match_pos !== \null && $this->match_pos < $current_pos);
+		$dirty = $this->check_pos === \null
+			|| $this->check_pos > $current_pos
+			|| ($this->match_pos !== \null && $this->match_pos < $current_pos);
 
 		if ($dirty) {
-
 			$this->check_pos = $current_pos;
 			$matched = \preg_match($this->rx, $this->parser->string, $this->matches, \PREG_OFFSET_CAPTURE, $this->check_pos);
 
@@ -47,7 +44,6 @@ class CachedRegexp {
 			} else {
 				$this->match_pos = \null;
 			}
-
 		}
 
 		if ($this->match_pos === $current_pos) {

@@ -10,133 +10,178 @@ namespace hafriedlander\Peg\Parser;
  *   for result construction and building
  */
 class Basic {
-	function __construct( $string ) {
-		$this->string = $string ;
-		$this->pos = 0 ;
 
-		$this->depth = 0 ;
+	private $isCallableCache = [];
 
-		$this->regexps = [] ;
+	public function __construct($string) {
+		$this->string = $string;
+		$this->pos = 0;
+		$this->depth = 0;
+		$this->regexps = [];
 	}
 
-	function whitespace() {
-		$matched = \preg_match( '/[ \t]+/', $this->string, $matches, \PREG_OFFSET_CAPTURE, $this->pos ) ;
-		if ( $matched && $matches[0][1] == $this->pos ) {
-			$this->pos += \strlen( $matches[0][0] );
-			return ' ' ;
+	protected function isCallable($name) {
+		return $this->isCallableCache[$name]
+			?? ($this->isCallableCache[$name] = \is_callable($this, $name));
+	}
+
+	public function whitespace() {
+
+		$matched = \preg_match(
+			'/[ \t]+/',
+			$this->string,
+			$matches,
+			\PREG_OFFSET_CAPTURE,
+			$this->pos
+		);
+
+		if ($matched && $matches[0][1] === $this->pos) {
+			$this->pos += \strlen($matches[0][0]);
+			return ' ';
 		}
-		return \false ;
+
+		return \false;
+
 	}
 
-	function literal( $token ) {
+	public function literal($token) {
 		/* Debugging: * / print( "Looking for token '$token' @ '" . substr( $this->string, $this->pos ) . "'\n" ) ; /* */
-		$toklen = \strlen( $token ) ;
-		$substr = \substr( $this->string, $this->pos, $toklen ) ;
-		if ( $substr == $token ) {
-			$this->pos += $toklen ;
-			return $token ;
+		$toklen = \strlen($token);
+		$substr = \substr($this->string, $this->pos, $toklen);
+		if ($substr === $token) {
+			$this->pos += $toklen;
+			return $token;
 		}
-		return \false ;
+
+		return \false;
 	}
 
-	function rx( $rx ) {
-		if ( !isset( $this->regexps[$rx] ) ) $this->regexps[$rx] = new CachedRegexp( $this, $rx ) ;
-		return $this->regexps[$rx]->match() ;
+	public function rx($rx) {
+
+		if (!isset($this->regexps[$rx])) {
+			$this->regexps[$rx] = new CachedRegexp($this, $rx);
+		}
+
+		return $this->regexps[$rx]->match();
 	}
 
-	function expression( $result, $stack, $value ) {
-		$stack[] = $result; $rv = \false;
+	public function expression($result, $stack, $value) {
+		$stack[] = $result;
+		$rv = \false;
 
 		/* Search backwards through the sub-expression stacks */
-		for ( $i = \count($stack) - 1 ; $i >= 0 ; $i-- ) {
+		for ($i = \count($stack) - 1; $i >= 0; $i--) {
 			$node = $stack[$i];
 
-			if ( isset($node[$value]) ) { $rv = $node[$value]; break; }
+			if (isset($node[$value])) {
+				$rv = $node[$value];
+				break;
+			}
 
 			foreach ($this->typestack($node['_matchrule']) as $type) {
-				$callback = array($this, "{$type}_DLR{$value}");
-				if ( is_callable( $callback ) ) { $rv = \call_user_func( $callback ) ; if ($rv !== \false) break; }
+				$callback = [$this, "{$type}_DLR{$value}"];
+				if (is_callable($callback)) {
+					$rv = \call_user_func($callback);
+					if ($rv !== \false) {
+						break;
+					}
+				}
 			}
 		}
 
-		if ($rv === \false) $rv = @$this->$value;
-		if ($rv === \false) $rv = @$this->$value();
+		if ($rv === \false) {
+			$rv = @$this->$value;
+		}
+
+		if ($rv === \false) {
+			$rv = @$this->$value();
+		}
 
 		return \is_array($rv) ? $rv['text'] : ($rv ? $rv : '');
 	}
 
-	function packhas( $key, $pos ) {
-		return \false ;
+	public function packhas($key, $pos) {
+		return \false;
 	}
 
-	function packread( $key, $pos ) {
-		throw new \Exception('PackRead after PackHas=>\false in Parser.php') ;
+	public function packread($key, $pos) {
+		throw new \Exception('PackRead after PackHas=>\false in Parser.php');
 	}
 
-	function packwrite( $key, $pos, $res ) {
-		return $res ;
+	public function packwrite($key, $pos, $res) {
+		return $res;
 	}
 
-	function typestack( $name ) {
-		$prop = "match_{$name}_typestack";
-		return $this->$prop;
+	public function typestack($name) {
+		return $this->{"match_{$name}_typestack"};
 	}
 
-	function construct( $matchrule, $name, $arguments = \null ) {
+	public function construct($matchrule, $name, $arguments = []) {
 
-		$result = array( '_matchrule' => $matchrule, 'name' => $name, 'text' => '' );
-		$result['offset'] = $this->pos;
+		$result = [
+			'_matchrule' => $matchrule,
+			'name' => $name,
+			'text' => '',
+			'offset' => $this->pos,
+		];
 
-		if ($arguments) $result = array_merge($result, $arguments) ;
+		if ($arguments) {
+			$result = array_merge($result, $arguments);
+		}
 
 		foreach ($this->typestack($matchrule) as $type) {
-			$callback = array( $this, "{$type}__construct" ) ;
-			if ( \is_callable( $callback ) ) {
-				\call_user_func_array( $callback, array( &$result ) ) ;
+			if ($method = $this->isCallable("{$type}__construct")) {
+				$this->{$method}(...[&$result]);
 				break;
 			}
 		}
 
-		return $result ;
+		return $result;
+
 	}
 
-	function finalise( &$result ) {
-
+	public function finalise(&$result) {
 		foreach ($this->typestack($result['_matchrule']) as $type) {
-			$callback = array( $this, "{$type}__finalise" ) ;
-			if ( \is_callable( $callback ) ) {
-				\call_user_func_array( $callback, array( &$result ) ) ;
+			if ($method = $this->isCallable("{$type}__finalise")) {
+				$this->{$method}(...[&$result]);
 				break;
 			}
 		}
 
-		return $result ;
+		return $result;
 	}
 
-	function store ( &$result, $subres, $storetag = \null ) {
-
+	public function store(&$result, $subres, $storetag = \null) {
 		$result['text'] .= $subres['text'];
 		$storecalled = \false;
 
 		foreach ($this->typestack($result['_matchrule']) as $type) {
-			$callback = array( $this, $storetag ? "{$type}_{$storetag}" : "{$type}_{$subres['name']}" ) ;
-			if ( \is_callable( $callback ) ) {
-				\call_user_func_array( $callback, array( &$result, $subres ) ) ;
-				$storecalled = \true; break;
+			if ($method = $this->isCallable($storetag ? "{$type}_{$storetag}" : "{$type}_{$subres['name']}")) {
+				$this->{$method}(...[&$result, $subres]);
+				$storecalled = \true;
+				break;
 			}
 
-			$globalcb = array( $this, "{$type}_STR" ) ;
-			if ( \is_callable( $globalcb ) ) {
-				\call_user_func_array( $globalcb, array( &$result, $subres ) ) ;
-				$storecalled = \true; break;
+			if ($method = $this->isCallable("{$type}_STR")) {
+				$this->{$method}(...[&$result, $subres]);
+				$storecalled = \true;
+				break;
 			}
 		}
-		if ( $storetag && !$storecalled ) {
-			if ( !isset( $result[$storetag] ) ) $result[$storetag] = $subres ;
-			else {
-				if ( isset( $result[$storetag]['text'] ) ) $result[$storetag] = array( $result[$storetag] ) ;
-				$result[$storetag][] = $subres ;
+
+		if ($storetag && !$storecalled) {
+			if (!isset($result[$storetag])) {
+				$result[$storetag] = $subres;
+			} else {
+				if (isset($result[$storetag]['text'])) {
+					$result[$storetag] = [$result[$storetag]];
+				}
+
+				$result[$storetag][] = $subres;
+
 			}
 		}
+
 	}
+
 }
