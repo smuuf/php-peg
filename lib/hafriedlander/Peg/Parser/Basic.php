@@ -22,7 +22,7 @@ class Basic {
 
 	protected function isCallable($name) {
 		return $this->isCallableCache[$name]
-			?? ($this->isCallableCache[$name] = \is_callable($this, $name));
+			?? ($this->isCallableCache[$name] = \is_callable([$this, $name]));
 	}
 
 	public function whitespace() {
@@ -156,13 +156,13 @@ class Basic {
 		$storecalled = \false;
 
 		foreach ($this->typestack($result['_matchrule']) as $type) {
-			if ($method = $this->isCallable($storetag ? "{$type}_{$storetag}" : "{$type}_{$subres['name']}")) {
+			if ($this->isCallable($method = $storetag ? "{$type}_{$storetag}" : "{$type}_{$subres['name']}")) {
 				$this->{$method}(...[&$result, $subres]);
 				$storecalled = \true;
 				break;
 			}
 
-			if ($method = $this->isCallable("{$type}_STR")) {
+			if ($this->isCallable($method = "{$type}_STR")) {
 				$this->{$method}(...[&$result, $subres]);
 				$storecalled = \true;
 				break;
