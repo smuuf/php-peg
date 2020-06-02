@@ -130,7 +130,7 @@ class Basic {
 		}
 
 		foreach ($this->typestack($matchrule) as $type) {
-			if ($method = $this->isCallable("{$type}__construct")) {
+			if ($this->isCallable($method = "{$type}__construct")) {
 				$this->{$method}(...[&$result]);
 				break;
 			}
@@ -142,7 +142,7 @@ class Basic {
 
 	public function finalise(&$result) {
 		foreach ($this->typestack($result['_matchrule']) as $type) {
-			if ($method = $this->isCallable("{$type}__finalise")) {
+			if ($this->isCallable($method = "{$type}__finalise")) {
 				$this->{$method}(...[&$result]);
 				break;
 			}
