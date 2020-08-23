@@ -64,7 +64,7 @@ class Recurse extends Token {
 			)
 		);
 
-		$builder->needsStack = true;
+		$builder->needsStack = \true;
 		return $builder;
 
 	}

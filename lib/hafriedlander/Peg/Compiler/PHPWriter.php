@@ -73,9 +73,7 @@ class PHPWriter {
 					'FBREAK' => '$' . $id . ' = \false; break;'
 				])
 			)
-			->l(
-				'while(false);'
-			)
+			->l('while(\false);')
 			->b('if( $' . $id . ' === \true )', 'MATCH')
 			->b('if( $' . $id . ' === \false)', 'FAIL');
 	}

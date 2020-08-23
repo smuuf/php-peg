@@ -81,7 +81,7 @@ class Basic {
 			foreach ($this->typestack($node['_matchrule']) as $type) {
 				$callback = [$this, "{$type}_DLR{$value}"];
 				if (is_callable($callback)) {
-					$rv = \call_user_func($callback);
+					$rv = $callback();
 					if ($rv !== \false) {
 						break;
 					}
@@ -97,7 +97,7 @@ class Basic {
 			$rv = @$this->$value();
 		}
 
-		return \is_array($rv) ? $rv['text'] : ($rv ? $rv : '');
+		return \is_array($rv) ? $rv['text'] : ($rv ?: '');
 	}
 
 	public function packhas($key, $pos) {
@@ -126,7 +126,7 @@ class Basic {
 		];
 
 		if ($arguments) {
-			$result = array_merge($result, $arguments);
+			$result = \array_merge($result, $arguments);
 		}
 
 		foreach ($this->typestack($matchrule) as $type) {

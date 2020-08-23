@@ -17,7 +17,7 @@ class FalseOnlyPackrat extends Basic {
     }
 
     public function packhas($key, $pos) {
-		return ($this->packstate[$key][$pos] ?? false) == 'F';
+		return ($this->packstate[$key][$pos] ?? \false) == 'F';
     }
 
     public function packread($key, $pos) {

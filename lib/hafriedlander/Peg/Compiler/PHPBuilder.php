@@ -4,7 +4,7 @@ namespace hafriedlander\Peg\Compiler;
 
 class PHPBuilder {
 
-	public $needsStack = false;
+	public $needsStack = \false;
 
 	static function build () {
 		return new PHPBuilder();
@@ -28,7 +28,7 @@ class PHPBuilder {
 
 			if ($lines instanceof PHPBuilder) {
 				if ($lines->needsStack) {
-					$this->needsStack = true;
+					$this->needsStack = \true;
 				}
 				$lines = $lines->lines;
 			} else {
@@ -54,7 +54,7 @@ class PHPBuilder {
 		$block->l(...$args);
 
 		if ($block->needsStack) {
-			$this->needsStack = true;
+			$this->needsStack = \true;
 		}
 
 		$this->lines[] = [$entry, $block->lines];

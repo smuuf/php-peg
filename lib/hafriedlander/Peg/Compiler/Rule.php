@@ -296,7 +296,7 @@ class Rule extends PHPWriter {
 
 		// Build an array of additional arguments to add to result node (if any)
 		if (empty($this->arguments)) {
-			$arguments = false;
+			$arguments = \false;
 		} else {
 			$arguments = '[';
 			foreach ($this->arguments as $k => $v) {
@@ -319,9 +319,10 @@ class Rule extends PHPWriter {
 			? '$newStack = \array_merge($stack, [$result]);'
 			: '';
 
+		$fnArguments = $block->needsStack ? '$stack = []' : '';
 		$arguments = $arguments ? ", {$arguments}" : '';
 		$match->b(
-			"function match_{$function_name} (\$stack = [])",
+			"function match_{$function_name} ($fnArguments)",
 			'$matchrule = "' . $function_name . '"; $result = $this->construct($matchrule, $matchrule' . $arguments . '); ' . $newStack ,
 			$block
 		);
