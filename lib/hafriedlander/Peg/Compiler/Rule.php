@@ -294,17 +294,6 @@ class Rule extends PHPWriter {
 
 		$typestack = "['" . \implode("','", $typestack) . "']";
 
-		// Build an array of additional arguments to add to result node (if any)
-		if (empty($this->arguments)) {
-			$arguments = \false;
-		} else {
-			$arguments = '[';
-			foreach ($this->arguments as $k => $v) {
-				$arguments .= "'$k' => '$v', ";
-			}
-			$arguments .= ']';
-		}
-
 		$match = PHPBuilder::build() ;
 
 		$match->l("protected \$match_{$function_name}_typestack = $typestack;");
@@ -314,16 +303,14 @@ class Rule extends PHPWriter {
 			'FAIL' => 'return \false;'
 		]);
 
-		// This is only needed if '$newStack' variable is actually used.
-		$newStack = $block->needsStack
-			? '$newStack = \array_merge($stack, [$result]);'
+		// Build an array of additional arguments to add to result node (if any).
+		$arguments = $this->arguments
+			? (", " . \var_export($this->arguments, \true))
 			: '';
 
-		$fnArguments = $block->needsStack ? '$stack = []' : '';
-		$arguments = $arguments ? ", {$arguments}" : '';
 		$match->b(
-			"function match_{$function_name} ($fnArguments)",
-			'$matchrule = "' . $function_name . '"; $result = $this->construct($matchrule, $matchrule' . $arguments . '); ' . $newStack ,
+			"function match_{$function_name}(\$stack = [])",
+			"\$matchrule = '$function_name'; \$result = \$this->construct(\$matchrule, \$matchrule$arguments); ",
 			$block
 		);
 

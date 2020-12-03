@@ -4,8 +4,6 @@ namespace hafriedlander\Peg\Compiler;
 
 class PHPBuilder {
 
-	public $needsStack = \false;
-
 	static function build () {
 		return new PHPBuilder();
 	}
@@ -27,9 +25,6 @@ class PHPBuilder {
 			}
 
 			if ($lines instanceof PHPBuilder) {
-				if ($lines->needsStack) {
-					$this->needsStack = \true;
-				}
 				$lines = $lines->lines;
 			} else {
 				$lines = \array_map('rtrim', $lines);
@@ -52,11 +47,6 @@ class PHPBuilder {
 
 		$block = new PHPBuilder();
 		$block->l(...$args);
-
-		if ($block->needsStack) {
-			$this->needsStack = \true;
-		}
-
 		$this->lines[] = [$entry, $block->lines];
 
 		return $this;
