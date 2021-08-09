@@ -36,7 +36,7 @@ class Basic {
 		);
 
 		if ($matched && $matches[0][1] === $this->pos) {
-			$this->pos += \strlen($matches[0][0]);
+			$this->pos += \mb_strlen($matches[0][0]);
 			return ' ';
 		}
 
@@ -45,9 +45,9 @@ class Basic {
 	}
 
 	public function literal($token) {
-		/* Debugging: * / print( "Looking for token '$token' @ '" . substr( $this->string, $this->pos ) . "'\n" ) ; /* */
-		$toklen = \strlen($token);
-		$substr = \substr($this->string, $this->pos, $toklen);
+		/* Debugging: * / print( "Looking for token '$token' @ '" . mb_substr( $this->string, $this->pos ) . "'\n" ) ; /* */
+		$toklen = \mb_strlen($token);
+		$substr = \mb_substr($this->string, $this->pos, $toklen);
 		if ($substr === $token) {
 			$this->pos += $toklen;
 			return $token;

@@ -25,7 +25,7 @@ class ParserTestWrapper {
 
 		$parser = new $class($string);
 		$res = $parser->$func();
-		return ($allowPartial || $parser->pos === strlen($string)) ? $res : false;
+		return ($allowPartial || $parser->pos === mb_strlen($string)) ? $res : false;
 	}
 
 	function matches($method, $string, $allowPartial = false) {

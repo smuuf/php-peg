@@ -28,7 +28,7 @@ class RuleSet {
 
 			// Strip off indent
 			if (!empty($indent)) {
-				if (\strpos($line, $indent) === 0) $line = \substr($line, \strlen($indent));
+				if (\mb_strpos($line, $indent) === 0) $line = \mb_substr($line, \mb_strlen($indent));
 				else \user_error('Non-blank line with inconsistent index in parser block', E_USER_ERROR);
 			}
 

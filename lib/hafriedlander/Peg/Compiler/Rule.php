@@ -150,58 +150,58 @@ class Rule extends PHPWriter {
 	)*/[a-zA-Z]*@xu' ;
 
 	public function tokenize($str, &$tokens, $o = 0) {
-		$length = \strlen($str);
+		$length = \mb_strlen($str);
 		$pending = new Rule\PendingState() ;
 
 		while ($o < $length) {
 			/* Absorb white-space */
 			if (\preg_match('/\G\s+/', $str, $match, 0, $o)) {
-				$o += \strlen($match[0]) ;
+				$o += \mb_strlen($match[0]) ;
 			}
 			/* Handle expression labels */
 			elseif (\preg_match('/\G(\w*):/', $str, $match, 0, $o)) {
 				$pending->set('tag', isset($match[1]) ? $match[1] : '') ;
-				$o += \strlen($match[0]) ;
+				$o += \mb_strlen($match[0]) ;
 			}
 			/* Handle descent token */
 			elseif (\preg_match('/\G[\w-]+/', $str, $match, 0, $o)) {
 				$tokens[] = $t = new Token\Recurse($match[0]) ;
 				$pending->apply_if_present($t) ;
-				$o += \strlen($match[0]) ;
+				$o += \mb_strlen($match[0]) ;
 			}
 			/* Handle " quoted literals */
 			elseif (\preg_match('/\G"[^"]*"/', $str, $match, 0, $o)) {
 				$tokens[] = $t = new Token\Literal($match[0]) ;
 				$pending->apply_if_present($t) ;
-				$o += \strlen($match[0]) ;
+				$o += \mb_strlen($match[0]) ;
 			}
 			/* Handle ' quoted literals */
 			elseif (\preg_match("/\G'[^']*'/", $str, $match, 0, $o)) {
 				$tokens[] = $t = new Token\Literal($match[0]) ;
 				$pending->apply_if_present($t) ;
-				$o += \strlen($match[0]) ;
+				$o += \mb_strlen($match[0]) ;
 			}
 			/* Handle regexs */
 			elseif (\preg_match(self::$rx_rx, $str, $match, 0, $o)) {
 				$tokens[] = $t = new Token\Regex($match[0]) ;
 				$pending->apply_if_present($t) ;
-				$o += \strlen($match[0]) ;
+				$o += \mb_strlen($match[0]) ;
 			}
 			/* Handle $ call literals */
 			elseif (\preg_match('/\G\$(\w+)/', $str, $match, 0, $o)) {
 				$tokens[] = $t = new Token\ExpressionedRecurse($match[1]) ;
 				$pending->apply_if_present($t) ;
-				$o += \strlen($match[0]) ;
+				$o += \mb_strlen($match[0]) ;
 			}
 			/* Handle flags */
 			elseif (\preg_match('/\G\@(\w+)/', $str, $match, 0, $o)) {
 				$l = \count($tokens) - 1 ;
-				$o += \strlen($match[0]) ;
+				$o += \mb_strlen($match[0]) ;
 				\user_error('TODO: Flags not currently supported', E_USER_WARNING) ;
 			}
 			/* Handle control tokens */
 			else {
-				$c = \substr($str, $o, 1) ;
+				$c = \mb_substr($str, $o, 1) ;
 				$l = \count($tokens) - 1 ;
 				$o += 1 ;
 				switch ($c) {
@@ -221,11 +221,11 @@ class Rule extends PHPWriter {
 								$max = $matches[3] ? (int) $matches[3] : \null;
 							}
 							$tokens[$l]->quantifier = ['min' => $min, 'max' => $max];
-							$o += \strlen($matches[0]) - 1;
+							$o += \mb_strlen($matches[0]) - 1;
 						} else {
 							throw new \Exception(sprintf(
 								'Unknown quantifier: %s',
-								substr($str, $o, 10)
+								\mb_substr($str, $o, 10)
 							));
 						}
 						break;

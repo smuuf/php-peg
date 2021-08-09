@@ -123,7 +123,7 @@ class PHPBuilder {
 				[$entry, $block] = $line;
 				$str = $this->render($block, $indent . "\t");
 
-				if (\strlen($str) < 40) {
+				if (\mb_strlen($str) < 40) {
 					$out[] = $indent . $entry . ' { ' . \ltrim($str) . ' }';
 				} else {
 					$out[] = $indent . $entry . ' {';

@@ -7,7 +7,7 @@ use hafriedlander\Peg\Compiler\PHPBuilder;
 class Literal extends Expressionable {
 
 	function __construct($value) {
-		parent::__construct('literal', "'" . \substr($value,1,-1) . "'");
+		parent::__construct('literal', "'" . \mb_substr($value,1,-1) . "'");
 	}
 
 	function match_code($value) {
@@ -18,8 +18,8 @@ class Literal extends Expressionable {
 		}
 
 		// We inline single-character matches for speed
-		if (!$this->contains_expression($value) && \strlen($evald) === 1) {
-			return $this->match_fail_conditional('\substr($this->string, $this->pos, 1) === '.$value,
+		if (!$this->contains_expression($value) && \mb_strlen($evald) === 1) {
+			return $this->match_fail_conditional('\mb_substr($this->string, $this->pos, 1) === '.$value,
 				PHPBuilder::build()->l(
 					'$this->pos += 1;',
 					$this->set_text($value)

@@ -24,7 +24,7 @@ class Recurse extends Token {
 				->l(
 					'$indent = str_repeat("| ", $this->depth / 2);',
 					'$this->depth += 2;',
-					'$sub = ((strlen($this->string) - $this->pos) > 40) ? (substr($this->string, $this->pos, 40) . "...") : substr($this->string, $this->pos);',
+					'$sub = ((mb_strlen($this->string) - $this->pos) > 40) ? (mb_substr($this->string, $this->pos, 40) . "...") : substr($this->string, $this->pos);',
 					'$sub = preg_replace(\'/(\r|\n)+/\', " {NL} ", $sub);',
 					sprintf('print $indent . "Matching: <%s> in \'".$sub."\' \n";', $function)
 				);

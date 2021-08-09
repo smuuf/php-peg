@@ -4,7 +4,7 @@ namespace hafriedlander\Peg\Parser;
 
 /**
  * We cache the last regex result. This is a low-cost optimization, because we have to do an un-anchored match + check match position anyway
- * (alternative is to do an anchored match on a string cut with substr, but that is very slow for long strings). We then don't need to recheck
+ * (alternative is to do an anchored match on a string cut with mb_substr, but that is very slow for long strings). We then don't need to recheck
  * for any position between current position and eventual match position - result will be the same
  *
  *  Of course, the next regex might be outside that bracket - after the bracket if other matches have progressed beyond the match position, or before
@@ -47,7 +47,7 @@ class CachedRegexp {
 		}
 
 		if ($this->match_pos === $current_pos) {
-			$this->parser->pos += \strlen($this->matches[0][0]);
+			$this->parser->pos += \mb_strlen($this->matches[0][0]);
 			return $this->matches[0][0];
 		}
 

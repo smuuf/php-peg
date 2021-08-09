@@ -20,7 +20,7 @@ class Compiler {
 		else                              $class = self::$currentClass = 'Anonymous Parser';
 
 		/* Check for pragmas */
-		if (strpos($class, '!') === 0) {
+		if (mb_strpos($class, '!') === 0) {
 			switch ($class) {
 				case '!silent':
 					// NOP - dont output
