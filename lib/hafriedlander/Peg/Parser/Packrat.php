@@ -37,7 +37,7 @@ class Packrat extends Basic {
 			return \false;
 		}
 
-		$this->pos = $this->packpos[$key][$pos];
+		$this->setPos($this->packpos[$key][$pos]);
 		return $this->packres[$key][$pos];
 
 	}

@@ -47,7 +47,7 @@ class CachedRegexp {
 		}
 
 		if ($this->match_pos === $current_pos) {
-			$this->parser->pos += \strlen($this->matches[0][0]);
+			$this->parser->addPos(\strlen($this->matches[0][0]));
 			return $this->matches[0][0];
 		}
 

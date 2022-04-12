@@ -33,7 +33,7 @@ class PHPWriter {
 		$code = PHPBuilder::build()
 			->l(
 				'$result = $res' . $id . ';',
-				'$this->pos = $pos' . $id . ';'
+				'$this->setPos($pos' . $id . ');'
 			);
 
 		if ($remove) {

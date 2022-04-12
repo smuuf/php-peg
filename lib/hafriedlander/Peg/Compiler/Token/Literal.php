@@ -11,21 +11,24 @@ class Literal extends Expressionable {
 	}
 
 	function match_code($value) {
+
 		try {
 			$evald = eval('return '. $value . ';');
 		} catch (\ParseError $e) {
 			die("PEG grammar parsing error in >return $value;<': " . $e->getMessage());
 		}
 
-		// We inline single-character matches for speed
+		// We inline single-character matches for speed.
 		if (!$this->contains_expression($value) && \strlen($evald) === 1) {
 			return $this->match_fail_conditional('\substr($this->string, $this->pos, 1) === '.$value,
 				PHPBuilder::build()->l(
-					'$this->pos += 1;',
+					'$this->addPos(1);',
 					$this->set_text($value)
 				)
 			);
 		}
+
 		return parent::match_code($value);
+
 	}
 }

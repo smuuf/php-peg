@@ -11,13 +11,23 @@ namespace hafriedlander\Peg\Parser;
  */
 class Basic {
 
+	public int $pos = 0;
+	public int $farthestPos = 0;
 	private $isCallableCache = [];
 
 	public function __construct($string) {
 		$this->string = $string;
-		$this->pos = 0;
 		$this->depth = 0;
 		$this->regexps = [];
+	}
+
+	public function setPos(int $n): void {
+		$this->farthestPos = \max($n, $this->farthestPos);
+		$this->pos = $n;
+	}
+
+	public function addPos(int $n): void {
+		$this->setPos($this->pos + $n);
 	}
 
 	protected function isCallable($name) {
@@ -36,7 +46,7 @@ class Basic {
 		);
 
 		if ($matched && $matches[0][1] === $this->pos) {
-			$this->pos += \strlen($matches[0][0]);
+			$this->addPos(\strlen($matches[0][0]));
 			return ' ';
 		}
 
@@ -49,7 +59,7 @@ class Basic {
 		$toklen = \strlen($token);
 		$substr = \substr($this->string, $this->pos, $toklen);
 		if ($substr === $token) {
-			$this->pos += $toklen;
+			$this->addPos($toklen);
 			return $token;
 		}
 
@@ -57,11 +67,7 @@ class Basic {
 	}
 
 	public function rx($rx) {
-
-		if (!isset($this->regexps[$rx])) {
-			$this->regexps[$rx] = new CachedRegexp($this, $rx);
-		}
-
+		$this->regexps[$rx] ??= new CachedRegexp($this, $rx);
 		return $this->regexps[$rx]->match();
 	}
 

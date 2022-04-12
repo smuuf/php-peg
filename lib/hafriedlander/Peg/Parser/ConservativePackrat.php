@@ -10,24 +10,27 @@ namespace hafriedlander\Peg\Parser;
  * @author Hamish Friedlander
  */
 class ConservativePackrat extends Basic {
-	function packhas( $key, $pos ) {
-		return isset( $this->packres[$key] ) && $this->packres[$key] !== \null ;
+
+	function packhas($key, $pos) {
+		return isset($this->packres[$key]);
 	}
 
 	function packread( $key, $pos ) {
-		$this->pos = $this->packpos[$key];
-		return $this->packres[$key] ;
+		$this->setPos($this->packpos[$key]);
+		return $this->packres[$key];
 	}
 
 	function packwrite( $key, $pos, $res ) {
-		if ( isset( $this->packres[$key] ) ) {
-			$this->packres[$key] = $res ;
-			$this->packpos[$key] = $this->pos ;
+
+		if (isset($this->packres[$key])) {
+			$this->packres[$key] = $res;
+			$this->packpos[$key] = $this->pos;
+		} else {
+			$this->packres[$key] = \null;
 		}
-		else {
-			$this->packres[$key] = \null ;
-		}
-		return $res ;
+
+		return $res;
+
 	}
 }
 
