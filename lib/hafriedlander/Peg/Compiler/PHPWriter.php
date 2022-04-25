@@ -13,7 +13,7 @@ class PHPWriter {
 		return '_' . (self::$varid++);
 	}
 
-	public function function_name($str) {
+	public function functionName($str) {
 		$str = \preg_replace('/-/', '_', $str);
 		$str = \preg_replace('/\$/', 'DLR', $str);
 		$str = \preg_replace('/\*/', 'STR', $str);
@@ -45,7 +45,7 @@ class PHPWriter {
 		return $code;
 	}
 
-	public function match_fail_conditional($on, $match = \null, $fail = \null) {
+	public function matchFailConditional($on, $match = \null, $fail = \null) {
 		return PHPBuilder::build()
 			->b(
 				'if (' . $on . ')',
@@ -59,7 +59,7 @@ class PHPWriter {
 			);
 	}
 
-	public function match_fail_block($code) {
+	public function matchFailBlock($code) {
 		$id = $this->varid();
 
 		return PHPBuilder::build()
@@ -74,7 +74,7 @@ class PHPWriter {
 				])
 			)
 			->l('while(\false);')
-			->b('if( $' . $id . ' === \true )', 'MATCH')
-			->b('if( $' . $id . ' === \false)', 'FAIL');
+			->b('if($' . $id . ' === \true)', 'MATCH')
+			->b('if($' . $id . ' === \false)', 'FAIL');
 	}
 }

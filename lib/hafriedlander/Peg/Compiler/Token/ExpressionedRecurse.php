@@ -3,7 +3,9 @@
 namespace hafriedlander\Peg\Compiler\Token;
 
 class ExpressionedRecurse extends Recurse {
-	function match_function( $value ) {
+
+	function matchFunction($value) {
 		return '$this->expression($result, $stack, \'' . $value . '\')';
 	}
+
 }

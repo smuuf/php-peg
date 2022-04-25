@@ -4,12 +4,10 @@ namespace hafriedlander\Peg\Compiler;
 
 class PHPBuilder {
 
-	static function build () {
-		return new PHPBuilder();
-	}
+	private array $lines = [];
 
-	function __construct() {
-		$this->lines = [];
+	static function build () {
+		return new PHPBuilder;
 	}
 
 	function l(...$args) {
@@ -20,11 +18,11 @@ class PHPBuilder {
 				continue;
 			}
 
-			if (is_string($lines)) {
+			if (\is_string($lines)) {
 				$lines = preg_split('/\r\n|\r|\n/', $lines);
 			}
 
-			if ($lines instanceof PHPBuilder) {
+			if ($lines instanceof self) {
 				$lines = $lines->lines;
 			} else {
 				$lines = \array_map('rtrim', $lines);
@@ -45,14 +43,14 @@ class PHPBuilder {
 
 		$entry = \array_shift($args);
 
-		$block = new PHPBuilder();
+		$block = new PHPBuilder;
 		$block->l(...$args);
 		$this->lines[] = [$entry, $block->lines];
 
 		return $this;
 	}
 
-	function replace($replacements, &$array = \null) {
+	function replace(array $replacements, array &$array = \null) {
 		if ($array === \null) {
 			unset($array);
 			$array =& $this->lines;
@@ -65,8 +63,10 @@ class PHPBuilder {
 			if (\is_array($array[$i])) {
 				$this->replace($replacements, $array[$i][1]);
 
-				if (\count($array[$i][1]) == 0) {
-					$nextelse = isset($array[$i+1]) && \is_array($array[$i+1]) && \preg_match('/^\s*else\s*$/i', $array[$i+1][0]);
+				if (\count($array[$i][1]) === 0) {
+					$nextelse = isset($array[$i + 1])
+						&& \is_array($array[$i + 1])
+						&& \preg_match('/^\s*else\s*$/i', $array[$i + 1][0]);
 
 					$delete = \preg_match('/^\s*else\s*$/i', $array[$i][0]);
 					$delete = $delete || (\preg_match('/^\s*if\s*\(/i', $array[$i][0]) && !$nextelse);
@@ -88,13 +88,15 @@ class PHPBuilder {
 						continue;
 					}
 
-					if (is_string($rep)) {
+					if (\is_string($rep)) {
 						$array[$i] = $rep;
 						$i++ ;
 						continue;
 					}
 
-					if ($rep instanceof PHPBuilder) $rep = $rep->lines;
+					if ($rep instanceof self) {
+						$rep = $rep->lines;
+					}
 
 					if (\is_array($rep)) {
 						\array_splice($array, $i, 1, $rep); $i += \count($rep) + 1;
@@ -111,14 +113,14 @@ class PHPBuilder {
 		return $this;
 	}
 
-	function render($array = \null, $indent = "") {
+	function render(?array $array = \null, string $indent = ""): string {
 
 		if ($array === \null) {
 			$array = $this->lines;
 		}
 
 		$out = [];
-		foreach($array as $line) {
+		foreach ($array as $line) {
 			if (\is_array($line)) {
 				[$entry, $block] = $line;
 				$str = $this->render($block, $indent . "\t");

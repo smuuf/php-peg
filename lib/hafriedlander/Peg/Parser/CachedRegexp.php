@@ -16,41 +16,54 @@ class CachedRegexp {
 	// x: Ignore extra whitespace.
 	const DEFAULT_MODIFIERS = 'Sx';
 
-	public function __construct($parser, $rx) {
+	private string $rx;
+	private Basic $parser;
+	private array $matches = [];
+	private ?int $matchPos;
+	private ?int $checkPos;
 
-		$this->parser = $parser;
+	public function __construct(Basic $parser, string $rx) {
+
 		// Modifiers can be specified multiple times, so no need to check for
 		// uniqueness.
 		$this->rx = $rx . self::DEFAULT_MODIFIERS;
+		$this->parser = $parser;
 
-		$this->matches = \null;
-		$this->match_pos = \null; // \null is no-match-to-end-of-string, unless check_pos also == \null, in which case means undefined.
-		$this->check_pos = \null;
+		$this->matchPos = \null; // \null is no-match-to-end-of-string, unless checkPos also == \null, in which case means undefined.
+		$this->checkPos = \null;
 
 	}
 
 	public function match() {
-		$current_pos = $this->parser->pos;
-		$dirty = $this->check_pos === \null
-			|| $this->check_pos > $current_pos
-			|| ($this->match_pos !== \null && $this->match_pos < $current_pos);
+
+		$currentPos = $this->parser->getPos();
+		$dirty = $this->checkPos === \null
+			|| $this->checkPos > $currentPos
+			|| ($this->matchPos !== \null && $this->matchPos < $currentPos);
 
 		if ($dirty) {
-			$this->check_pos = $current_pos;
-			$matched = \preg_match($this->rx, $this->parser->string, $this->matches, \PREG_OFFSET_CAPTURE, $this->check_pos);
 
-			if ($matched) {
-				$this->match_pos = $this->matches[0][1];
-			} else {
-				$this->match_pos = \null;
-			}
+			$this->checkPos = $currentPos;
+			$matched = \preg_match(
+				$this->rx,
+				$this->parser->getString(),
+				$this->matches,
+				\PREG_OFFSET_CAPTURE,
+				$this->checkPos
+			);
+
+			$this->matchPos = $matched
+				? $this->matches[0][1]
+				: \null;
+
 		}
 
-		if ($this->match_pos === $current_pos) {
-			$this->parser->addPos(\strlen($this->matches[0][0]));
-			return $this->matches[0][0];
+		if ($this->matchPos !== $currentPos) {
+			return \false;
 		}
 
-		return \false;
+		$this->parser->addPos(\strlen($this->matches[0][0]));
+		return $this->matches[0][0];
+
 	}
 }

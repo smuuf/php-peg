@@ -11,7 +11,7 @@ class ParserTestWrapper {
 		$this->class = $class;
 	}
 
-	function function_name( $str ) {
+	function functionName( $str ) {
 		$str = preg_replace( '/-/', '_', $str );
 		$str = preg_replace( '/\$/', 'DLR', $str );
 		$str = preg_replace( '/\*/', 'STR', $str );
@@ -21,11 +21,11 @@ class ParserTestWrapper {
 
 	function match($method, $string, $allowPartial = false) {
 		$class = $this->class;
-		$func = $this->function_name('match_' . $method);
+		$func = $this->functionName('match_' . $method);
 
 		$parser = new $class($string);
 		$res = $parser->$func();
-		return ($allowPartial || $parser->pos === strlen($string)) ? $res : false;
+		return ($allowPartial || $parser->getPos() === strlen($string)) ? $res : false;
 	}
 
 	function matches($method, $string, $allowPartial = false) {

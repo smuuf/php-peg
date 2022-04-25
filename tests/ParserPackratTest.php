@@ -2,7 +2,7 @@
 
 require_once "ParserTestBase.php";
 
-class PackratParserSyntaxTest extends ParserTestBase {
+class ParserPackratTest extends ParserTestBase {
 
 	public function testBasicRuleSyntax() {
 

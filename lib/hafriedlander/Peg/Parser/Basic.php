@@ -11,23 +11,49 @@ namespace hafriedlander\Peg\Parser;
  */
 class Basic {
 
-	public int $pos = 0;
-	public int $farthestPos = 0;
-	private $isCallableCache = [];
+	protected string $string = '';
+	protected int $debugDepth = 0;
+	protected int $pos = 0;
+	protected int $farthestPos = 0;
+	protected ?string $currentRule = \null;
+	protected ?string $farthestRule = \null;
+	private array $isCallableCache = [];
+	private array $regexps = [];
 
-	public function __construct($string) {
+	public function __construct(string $string) {
 		$this->string = $string;
-		$this->depth = 0;
 		$this->regexps = [];
 	}
 
 	public function setPos(int $n): void {
-		$this->farthestPos = \max($n, $this->farthestPos);
+
+		if ($n > $this->farthestPos) {
+			$this->farthestRule = $this->currentRule;
+			$this->farthestPos = $n;
+		}
+
 		$this->pos = $n;
+
 	}
 
 	public function addPos(int $n): void {
 		$this->setPos($this->pos + $n);
+	}
+
+	public function getPos(): int {
+		return $this->pos;
+	}
+
+	public function getFarthestPos(): int {
+		return $this->farthestPos;
+	}
+
+	public function getFarthestRule(): ?string {
+		return $this->farthestRule;
+	}
+
+	public function getString(): string {
+		return $this->string;
 	}
 
 	protected function isCallable($name) {
@@ -35,7 +61,7 @@ class Basic {
 			?? ($this->isCallableCache[$name] = \is_callable([$this, $name]));
 	}
 
-	public function whitespace() {
+	protected function whitespace() {
 
 		$matched = \preg_match(
 			'/[ \t]+/',
@@ -54,7 +80,7 @@ class Basic {
 
 	}
 
-	public function literal($token) {
+	protected function literal($token) {
 		/* Debugging: * / print( "Looking for token '$token' @ '" . substr( $this->string, $this->pos ) . "'\n" ) ; /* */
 		$toklen = \strlen($token);
 		$substr = \substr($this->string, $this->pos, $toklen);
@@ -66,12 +92,12 @@ class Basic {
 		return \false;
 	}
 
-	public function rx($rx) {
+	protected function rx($rx) {
 		$this->regexps[$rx] ??= new CachedRegexp($this, $rx);
 		return $this->regexps[$rx]->match();
 	}
 
-	public function expression($result, $stack, $value) {
+	protected function expression($result, $stack, $value) {
 		$stack[] = $result;
 		$rv = \false;
 
@@ -85,9 +111,8 @@ class Basic {
 			}
 
 			foreach ($this->typestack($node['_matchrule']) as $type) {
-				$callback = [$this, "{$type}_DLR{$value}"];
-				if (is_callable($callback)) {
-					$rv = $callback();
+				if ($this->isCallable($method = "{$type}_DLR{$value}")) {
+					$rv = $this->{$method}();
 					if ($rv !== \false) {
 						break;
 					}
@@ -162,17 +187,24 @@ class Basic {
 		$storecalled = \false;
 
 		foreach ($this->typestack($result['_matchrule']) as $type) {
-			if ($this->isCallable($method = $storetag ? "{$type}_{$storetag}" : "{$type}_{$subres['name']}")) {
+
+			$method = $storetag
+				? "{$type}_{$storetag}"
+				: "{$type}_{$subres['name']}";
+
+			if ($this->isCallable($method)) {
 				$this->{$method}(...[&$result, $subres]);
 				$storecalled = \true;
 				break;
 			}
 
-			if ($this->isCallable($method = "{$type}_STR")) {
+			$method = "{$type}_STR";
+			if ($this->isCallable($method)) {
 				$this->{$method}(...[&$result, $subres]);
 				$storecalled = \true;
 				break;
 			}
+
 		}
 
 		if ($storetag && !$storecalled) {
@@ -184,7 +216,6 @@ class Basic {
 				}
 
 				$result[$storetag][] = $subres;
-
 			}
 		}
 

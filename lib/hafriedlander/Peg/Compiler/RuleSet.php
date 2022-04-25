@@ -3,28 +3,42 @@
 namespace hafriedlander\Peg\Compiler;
 
 class RuleSet {
-	public $rules = [];
 
-	function addRule($indent, $lines, &$out) {
-		$rule = new Rule($this, $lines) ;
-		$this->rules[$rule->name] = $rule;
+	/** @var Rule[] */
+	private array $rules = [];
 
-		$out[] = $indent . '/* ' . $rule->name . ':' . $rule->rule . ' */' . \PHP_EOL ;
-		$out[] = $rule->compile($indent) ;
-		$out[] = \PHP_EOL ;
+	function addRule(string $indent, array $lines, &$out): void {
+
+		$rule = new Rule($this, $lines);
+		$ruleName = $rule->getName();
+		$this->rules[$ruleName] = $rule;
+
+		$out[] = $indent . '/* ' . $ruleName . ':' . $rule->getRule() . ' */' . \PHP_EOL;
+		$out[] = $rule->compile($indent);
+		$out[] = \PHP_EOL;
+
+	}
+
+	public function getRule(string $name): ?Rule {
+		return $this->rules[$name] ?? \null;
 	}
 
 	function compile($indent, $rulestr) {
-		$indentrx = '@^'.\preg_quote($indent).'@';
 
 		$out = [];
 		$block = [];
 
 		foreach (\preg_split('/\r\n|\r|\n/', $rulestr) as $line) {
+
 			// Ignore blank lines
-			if (!\trim($line)) continue;
+			if (!\trim($line)) {
+				continue;
+			}
+
 			// Ignore comments
-			if (\preg_match('/^[\x20\t]*#/', $line)) continue;
+			if (\preg_match('/^[\x20\t]*#/', $line)) {
+				continue;
+			}
 
 			// Strip off indent
 			if (!empty($indent)) {
@@ -33,19 +47,27 @@ class RuleSet {
 			}
 
 			// Any indented line, add to current set of lines
-			if (\preg_match('/^[\x20\t]/', $line)) $block[] = $line;
+			if (\preg_match('/^[\x20\t]/', $line)) {
+				$block[] = $line;
+			} else {
 
-			// Any non-indented line marks a new block. Add a rule for the current block, then start a new block
-			else {
-				if (\count($block)) $this->addRule($indent, $block, $out);
+				// Any non-indented line marks a new block. Add a rule for the current block, then start a new block
+				if (\count($block)) {
+					$this->addRule($indent, $block, $out);
+				}
+
 				$block = [$line];
+
 			}
+
 		}
 
 		// Any unfinished block add a rule for
-		if (\count($block)) $this->addRule($indent, $block, $out);
+		if (\count($block)) {
+			$this->addRule($indent, $block, $out);
+		}
 
 		// And return the compiled version
-		return \implode( '', $out ) ;
+		return \implode('', $out);
 	}
 }

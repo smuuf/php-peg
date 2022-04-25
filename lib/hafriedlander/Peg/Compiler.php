@@ -4,75 +4,64 @@ namespace hafriedlander\Peg;
 
 class Compiler {
 
-	static $parsers = [];
+	private static array $parsers = [];
+	public static bool $debug = \false;
 
-	static $debug = \false;
+	private static function createParser(array $match) {
+		$name = $match['name'] ?? 'Anonymous Parser';
 
-	static $currentClass = \null;
+		// Handle pragmas.
+		if ($match['pragmas'] ?? \false) {
+			foreach (\explode('!', $match['pragmas']) as $pragma) {
 
-	static function create_parser( $match ) {
-		/* We allow indenting of the whole rule block, but only to the level of the comment start's indent */
-		$indent = $match[1];
-
-		/* Get the parser name for this block */
-		if     ($class = trim($match[2])) self::$currentClass = $class;
-		elseif (self::$currentClass)      $class = self::$currentClass;
-		else                              $class = self::$currentClass = 'Anonymous Parser';
-
-		/* Check for pragmas */
-		if (strpos($class, '!') === 0) {
-			switch ($class) {
-				case '!silent':
-					// NOP - dont output
-					return '';
-				case '!insert_autogen_warning':
-					return $indent . implode(PHP_EOL.$indent, array(
-						'/*',
-						'WARNING: This file has been machine generated. Do not edit it, or your changes will be overwritten next time it is compiled.',
-						'*/'
-					)) .\PHP_EOL;
-				case '!debug':
-					self::$debug = \true;
-					break;
+				$pragma = \trim($pragma);
+				if ($pragma === '') {
+					continue;
 				}
 
-				throw new \Exception("Unknown pragma $class encountered when compiling parser");
+				switch ($pragma) {
+					case 'debug':
+						self::$debug = \true;
+						break;
+					default:
+						throw new \RuntimeException("Unknown pragma '$pragma' encountered");
+				}
+
 			}
+		}
 
-		if (!isset(self::$parsers[$class])) self::$parsers[$class] = new Compiler\RuleSet();
+		self::$parsers[$name] ??= new Compiler\RuleSet;
 
-		return self::$parsers[$class]->compile($indent, $match[3]);
+		// We allow indenting of the whole rule block, but only to the level
+		// of the comment start's indent */
+		$indent = $match['indent'];
+
+		return self::$parsers[$name]->compile($indent, $match['grammar']);
+
 	}
 
-	static function compile( $string ) {
+	public static function compile(string $string): string {
+
 		static $rx = '@
-			^([\x20\t]*)/\*!\* (?:[\x20\t]*(!?\w*))?   # Start with some indent, a comment with the special marker, then an optional name
-			(.*)                                       # Any character
-			\*/                                        # The comment end
+			# Optional indent and marker of grammar definition start.
+			^(?<indent>\h*)/\*!\*
+
+			# Optional pragmas and optional name.
+			\h*(?<pragmas>(!\w+)+\h+)?(?<name>(\w)+)?\h*\r?\n
+
+			# Any character
+			(?<grammar>.+)(?=\*/)
+
+			# Grammar definition end.
+			\*/
 		@smx';
 
-		return preg_replace_callback( $rx, array( __CLASS__, 'create_parser' ), $string ) ;
+		return preg_replace_callback(
+			$rx,
+			[self::class, 'createParser'],
+			$string
+		);
+
 	}
 
-	static function cli( $args ) {
-		if ( count( $args ) == 1 ) {
-			print "Parser Compiler: A compiler for PEG parsers in PHP \n" ;
-			print "(C) 2009 SilverStripe. See COPYING for redistribution rights. \n" ;
-			print "\n" ;
-			print "Usage: {$args[0]} infile [ outfile ]\n" ;
-			print "\n" ;
-		}
-		else {
-			$fname = ( $args[1] == '-' ? 'php://stdin' : $args[1] ) ;
-			$string = file_get_contents( $fname ) ;
-			$string = self::compile( $string ) ;
-
-			if ( !empty( $args[2] ) && $args[2] != '-' ) {
-				file_put_contents( $args[2], $string ) ;
-			}
-			else {
-				print $string ;
-			}
-		}
-	}
 }

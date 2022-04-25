@@ -6,14 +6,16 @@ use hafriedlander\Peg\Compiler\Token;
 
 abstract class Terminal extends Token {
 
-	function set_text($text) {
-		return $this->silent ? \null : '$result["text"] .= ' . $text . ';';
+	function setText($text) {
+		return $this->silent
+			? \null
+			: '$result["text"] .= ' . $text . ';';
 	}
 
-	protected function match_code($value) {
-		return $this->match_fail_conditional(
+	protected function matchCode($value) {
+		return $this->matchFailConditional(
 			'($subres = $this->' . $this->type . '(' . $value . ')) !== \false',
-			$this->set_text('$subres')
+			$this->setText('$subres')
 		);
 	}
 

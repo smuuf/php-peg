@@ -11,7 +11,7 @@ class Sequence extends Token {
 		parent::__construct('sequence', $value);
 	}
 
-	function match_code($value) {
+	function matchCode($value) {
 		$code = PHPBuilder::build();
 
 		foreach ($value as $token) {
@@ -24,7 +24,7 @@ class Sequence extends Token {
 		}
 
 		$code->l('MBREAK');
-		return $this->match_fail_block($code);
+		return $this->matchFailBlock($code);
 
 	}
 
