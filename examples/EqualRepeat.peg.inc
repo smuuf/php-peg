@@ -1,6 +1,7 @@
 <?php
 
-require_once dirname(__DIR__).'/autoloader.php';
+require __DIR__ . /../vendor/autoload.php';
+
 use hafriedlander\Peg\Parser;
 
 class EqualRepeat extends Parser\Packrat {

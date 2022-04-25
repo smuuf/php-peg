@@ -2,4 +2,4 @@
 
 cd $(dirname $0)/..
 
-./vendor/bin/tester ./tests
+./vendor/bin/tester -p phpdbg ./tests $@

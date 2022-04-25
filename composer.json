@@ -21,7 +21,7 @@
         {
             "name": "Premysl Karbula",
             "role": "Developer"
-        },		
+        },
         {
             "name": "Johannes Künsebeck",
             "email": "kuensebeck@googlemail.com",
@@ -41,7 +41,6 @@
             "hafriedlander\\Peg": "lib"
         }
     },
-    "bin": ["bin/peg"],
     "require-dev": {
         "phpstan/phpstan": "^1.5",
         "nette/tester": "^2.4"
