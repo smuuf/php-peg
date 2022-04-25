@@ -12,7 +12,7 @@ class Recurse extends Token {
 	}
 
 	public function matchFunction($value) {
-		return $this->functionName($value);
+		return "'" . $this->functionName($value) . "'";
 	}
 
 	public function matchCode($value) {
@@ -49,11 +49,11 @@ class Recurse extends Token {
 		}
 
 		$builder = PHPBuilder::build()->l(
-			'$key = \'match_' . $function . '\'; $pos = $this->pos;',
+			'$key = \'match_\'.'.$function.'; $pos = $this->pos;',
 			$debugHeader,
 			'$subres = $this->packhas($key, $pos)' . "\n\t"
 			. '? $this->packread($key, $pos)' . "\n\t"
-			. ': $this->packwrite($key, $pos, $this->match_' . $function . '(\array_merge($stack, [$result])));',
+			. ': $this->packwrite($key, $pos, $this->{$key}(\array_merge($stack, [$result])));',
 			$this->matchFailConditional(
 				'$subres !== \false',
 				PHPBuilder::build()->l(

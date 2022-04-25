@@ -1,10 +1,11 @@
 <?php
 
-require_once "ParserTestBase.php";
+require __DIR__ . '/bootstrap.php';
 
 class ParserSyntaxTest extends ParserTestBase {
 
 	public function testBasicRuleSyntax() {
+
 		$parser = $this->buildParser('
 			/*!* BasicRuleSyntax
 			Foo: "a" "b"
@@ -24,9 +25,11 @@ class ParserSyntaxTest extends ParserTestBase {
 		$parser->assertMatches('Baz', 'ab');
 		$parser->assertMatches('Qux', 'ab');
 		$parser->assertMatches('Quux', 'a');
+
 	}
 
 	public function testRuleNamesCanContainHyphens() {
+
 		$parser = $this->buildParser('
 			/*!* RuleNamesCanContainHyphens
 			Foo-one: "a" "b"
@@ -36,9 +39,11 @@ class ParserSyntaxTest extends ParserTestBase {
 
 		$parser->assertMatches('Foo-one', 'ab');
 		$parser->assertMatches('Foo-two', 'ba');
+
 	}
 
 	public function testComplexRulesCanStartWithARegex() {
+
 		$parser = $this->buildParser('
 			/*!* ComplexRulesCanStartWithARegex
 			Foo: /foo/ "bar"
@@ -47,5 +52,8 @@ class ParserSyntaxTest extends ParserTestBase {
 
 		$parser->assertDoesntMatch('Foo', 'foo');
 		$parser->assertMatches('Foo', 'foobar');
+
 	}
 }
+
+(new ParserSyntaxTest)->run();

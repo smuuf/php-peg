@@ -1,6 +1,6 @@
 <?php
 
-require_once "ParserTestBase.php";
+require __DIR__ . '/bootstrap.php';
 
 class ParserPackratTest extends ParserTestBase {
 
@@ -30,3 +30,5 @@ class ParserPackratTest extends ParserTestBase {
 	}
 
 }
+
+(new ParserPackratTest)->run();

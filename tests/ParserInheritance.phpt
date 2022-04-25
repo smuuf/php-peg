@@ -1,6 +1,8 @@
 <?php
 
-require_once "ParserTestBase.php";
+use \Tester\Assert;
+
+require __DIR__ . '/bootstrap.php';
 
 class ParserInheritanceTest extends ParserTestBase {
 
@@ -13,11 +15,11 @@ class ParserInheritanceTest extends ParserTestBase {
 			*/
 		');
 
-		$this->assertTrue($parser->matches('Foo', 'a'));
-		$this->assertTrue($parser->matches('Bar', 'a'));
+		Assert::true($parser->matches('Foo', 'a'));
+		Assert::true($parser->matches('Bar', 'a'));
 
-		$this->assertFalse($parser->matches('Foo', 'b'));
-		$this->assertFalse($parser->matches('Bar', 'b'));
+		Assert::false($parser->matches('Foo', 'b'));
+		Assert::false($parser->matches('Bar', 'b'));
 	}
 
 
@@ -32,10 +34,10 @@ class ParserInheritanceTest extends ParserTestBase {
 		');
 
 		$res = $parser->match('Foo', 'a');
-		$this->assertEquals($res['test'], 'test');
+		Assert::same($res['test'], 'test');
 
 		$res = $parser->match('Bar', 'a');
-		$this->assertEquals($res['test'], 'test');
+		Assert::same($res['test'], 'test');
 
 		$parser = $this->buildParser('
 			/*!* BasicInheritanceConstructFallbackParser2
@@ -47,14 +49,14 @@ class ParserInheritanceTest extends ParserTestBase {
 		');
 
 		$res = $parser->match('Foo', 'a');
-		$this->assertArrayHasKey('testa', $res);
-		$this->assertEquals($res['testa'], 'testa');
-		$this->assertArrayNotHasKey('testb', $res);
+		Assert::hasKey('testa', $res);
+		Assert::same($res['testa'], 'testa');
+		Assert::hasNotKey('testb', $res);
 
 		$res = $parser->match('Bar', 'a');
-		$this->assertArrayHasKey('testb', $res);
-		$this->assertEquals($res['testb'], 'testb');
-		$this->assertArrayNotHasKey('testa', $res);
+		Assert::hasKey('testb', $res);
+		Assert::same($res['testb'], 'testb');
+		Assert::hasNotKey('testa', $res);
 
 	}
 
@@ -69,10 +71,10 @@ class ParserInheritanceTest extends ParserTestBase {
 		');
 
 		$res = $parser->match('Foo', 'a');
-		$this->assertEquals($res['test'], 'test');
+		Assert::same($res['test'], 'test');
 
 		$res = $parser->match('Bar', 'a');
-		$this->assertEquals($res['test'], 'test');
+		Assert::same($res['test'], 'test');
 
 		$parser = $this->buildParser('
 			/*!* BasicInheritanceStoreFallbackParser2
@@ -86,24 +88,25 @@ class ParserInheritanceTest extends ParserTestBase {
 		');
 
 		$res = $parser->match('Foo', 'ab');
-		$this->assertArrayHasKey('testa', $res);
-		$this->assertEquals($res['testa'], 'testa');
-		$this->assertArrayNotHasKey('testb', $res);
+		Assert::hasKey('testa', $res);
+		Assert::same($res['testa'], 'testa');
+		Assert::hasNotKey('testb', $res);
 
 		$res = $parser->match('Bar', 'ab');
-		$this->assertArrayHasKey('testb', $res);
-		$this->assertEquals($res['testb'], 'testb');
-		$this->assertArrayNotHasKey('testa', $res);
+		Assert::hasKey('testb', $res);
+		Assert::same($res['testb'], 'testb');
+		Assert::hasNotKey('testa', $res);
 
 		$res = $parser->match('Baz', 'ab');
-		$this->assertArrayHasKey('testa', $res);
-		$this->assertEquals($res['testa'], 'testa');
-		$this->assertArrayHasKey('testc', $res);
-		$this->assertEquals($res['testc'], 'testc');
-		$this->assertArrayNotHasKey('testb', $res);
+		Assert::hasKey('testa', $res);
+		Assert::same($res['testa'], 'testa');
+		Assert::hasKey('testc', $res);
+		Assert::same($res['testc'], 'testc');
+		Assert::hasNotKey('testb', $res);
 	}
 
 	public function testInheritanceByReplacement() {
+
 		$parser = $this->buildParser('
 			/*!* InheritanceByReplacementParser
 			A: "a"
@@ -117,6 +120,9 @@ class ParserInheritanceTest extends ParserTestBase {
 		$parser->assertMatches('Foo', 'ab');
 		$parser->assertMatches('Bar', 'aa');
 		$parser->assertMatches('Baz', 'b');
+
 	}
 
 }
+
+(new ParserInheritanceTest)->run();

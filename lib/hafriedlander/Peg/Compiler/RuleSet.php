@@ -69,5 +69,7 @@ class RuleSet {
 
 		// And return the compiled version
 		return \implode('', $out);
+
 	}
+
 }

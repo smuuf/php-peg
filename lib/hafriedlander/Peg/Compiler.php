@@ -4,7 +4,9 @@ namespace hafriedlander\Peg;
 
 class Compiler {
 
+	/** @var Compiler\RuleSet[] */
 	private static array $parsers = [];
+
 	public static bool $debug = \false;
 
 	private static function createParser(array $match) {

@@ -1,10 +1,11 @@
 <?php
 
-require_once "ParserTestBase.php";
+require __DIR__ . '/bootstrap.php';
 
 class ParserVariablesTest extends ParserTestBase {
 
 	public function testBasicLiteralVariables() {
+
 		$parser = $this->buildParser('
 			/*!* BasicVariables
 			Foo: Letter:"a" "$Letter"
@@ -18,26 +19,32 @@ class ParserVariablesTest extends ParserTestBase {
 		$parser->assertMatches('Bar', 'bb b');
 		$parser->assertMatches('Baz', 'cc a c a');
 		$parser->assertMatches('Qux', 'ddada');
+
 	}
 
 	public function testRecurseOnVariables() {
+
 		$parser = $this->buildParser('
-			/*!* RecurseOnVariablesParser
-			A: "a"
-			B: "b"
-			Foo: $Template
-			Bar: Foo
-				function __construct(&$res){ $res["Template"] = "A"; }
-			Baz: Foo
-				function __construct(&$res){ $res["Template"] = "B"; }
-			*/
+		/*!* RecurseOnVariablesParser
+		A: "a"
+		B: "b"
+		Foo: $Template
+		Bar: Foo
+			function __construct(&$res){ $res["Template"] = "A"; }
+		Baz: Foo
+			function __construct(&$res){ $res["Template"] = "B"; }
+		*/
 		');
 
-		$parser->assertMatches('Bar', 'a');	$parser->assertDoesntMatch('Bar', 'b');
-		$parser->assertMatches('Baz', 'b');	$parser->assertDoesntMatch('Baz', 'a');
+		$parser->assertMatches('Bar', 'a');
+		$parser->assertDoesntMatch('Bar', 'b');
+		$parser->assertMatches('Baz', 'b');
+		$parser->assertDoesntMatch('Baz', 'a');
+
 	}
 
 	public function testSetOnRuleVariables() {
+
 		$parser = $this->buildParser('
 			/*!* SetOnRuleVariablesParser
 			A: "a"
@@ -50,6 +57,9 @@ class ParserVariablesTest extends ParserTestBase {
 
 		$parser->assertMatches('Bar', 'a');
 		$parser->assertMatches('Baz', 'b');
+
 	}
 
 }
+
+(new ParserVariablesTest)->run();
