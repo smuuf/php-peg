@@ -171,7 +171,7 @@ class Rule extends PHPWriter {
 			}
 			/* Handle expression labels */
 			elseif (\preg_match('/\G(\w*):/', $str, $match, 0, $o)) {
-				$pending->set('tag', $match[1] ?? '');
+				$pending->set('tag', $match[1] ?: '');
 				$o += \strlen($match[0]);
 			}
 			/* Handle descent token */

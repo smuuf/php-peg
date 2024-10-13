@@ -1,11 +1,19 @@
 <?php
 
-use \Tester\Assert;
-use \Tester\TestCase;
+declare(strict_types=1);
 
-use \hafriedlander\Peg;
+use Tester\Assert;
+use Tester\TestCase;
+
+use hafriedlander\Peg;
+use hafriedlander\Peg\Parser\Basic;
 
 class ParserTestWrapper {
+
+	/**
+	 * @var class-string<Basic>
+	 */
+	private string $parserClass;
 
 	function __construct(string $parserClass) {
 		$this->parserClass = $parserClass;
@@ -59,11 +67,14 @@ class ParserTestWrapper {
 
 class ParserTestBase extends TestCase {
 
-	function buildParser($grammar, $baseClass = 'Basic') {
+	function buildParser(
+		string $grammar,
+		string $baseClass = Basic::class,
+	): ParserTestWrapper {
 
 		$class = 'Parser_' . md5(uniqid());
 		eval(Peg\Compiler::compile("
-			class $class extends hafriedlander\Peg\Parser\\$baseClass {
+			class $class extends $baseClass {
 				$grammar
 			}
 		"));

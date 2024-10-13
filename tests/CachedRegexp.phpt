@@ -1,9 +1,11 @@
 <?php
 
-use \Tester\Assert;
+declare(strict_types=1);
 
-use \hafriedlander\Peg\Parser\Basic;
-use \hafriedlander\Peg\Parser\CachedRegexp;
+use Tester\Assert;
+
+use hafriedlander\Peg\Parser\Basic;
+use hafriedlander\Peg\Parser\CachedRegexp;
 
 require __DIR__ . '/bootstrap.php';
 

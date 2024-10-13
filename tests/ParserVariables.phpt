@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 require __DIR__ . '/bootstrap.php';
 
 class ParserVariablesTest extends ParserTestBase {
@@ -25,15 +27,15 @@ class ParserVariablesTest extends ParserTestBase {
 	public function testRecurseOnVariables() {
 
 		$parser = $this->buildParser('
-		/*!* RecurseOnVariablesParser
-		A: "a"
-		B: "b"
-		Foo: $Template
-		Bar: Foo
-			function __construct(&$res){ $res["Template"] = "A"; }
-		Baz: Foo
-			function __construct(&$res){ $res["Template"] = "B"; }
-		*/
+			/*!* RecurseOnVariablesParser
+			A: "a"
+			B: "b"
+			Foo: $Template
+			Bar: Foo
+				function __construct(&$res){ $res["Template"] = "A"; }
+			Baz: Foo
+				function __construct(&$res){ $res["Template"] = "B"; }
+			*/
 		');
 
 		$parser->assertMatches('Bar', 'a');

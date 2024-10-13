@@ -1,5 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
+use hafriedlander\Peg\Parser\Packrat;
+
 require __DIR__ . '/bootstrap.php';
 
 class ParserPackratTest extends ParserTestBase {
@@ -22,7 +26,7 @@ class ParserPackratTest extends ParserTestBase {
 
 			Expression: Add
 			*/
-		', 'Packrat');
+		', Packrat::class);
 
 		$parser->assertMatches('Expression', '1 + 2 * 3 + 4 + 4 + 4 + 4 + 4 / 5 - 6 + 7 * 8 - 9');
 		$parser->assertDoesntMatch('Expression', 'variables + do + not + exist');
